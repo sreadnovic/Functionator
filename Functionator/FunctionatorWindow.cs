@@ -16,19 +16,19 @@ namespace Functionator
     /// </para>
     /// </remarks>
     [Guid("3386414c-0d97-4b8f-b3f4-1db79a9527d0")]
-    public class MyWindow : ToolWindowPane
+    public class FunctionatorWindow : ToolWindowPane
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MyWindow"/> class.
+        /// Initializes a new instance of the <see cref="FunctionatorWindow"/> class.
         /// </summary>
-        public MyWindow() : base(null)
+        public FunctionatorWindow() : base(null)
         {
-            this.Caption = "MyWindow";
+            this.Caption = "FunctionatorWindow";
 
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
-            this.Content = new MyWindowControl();
+            this.Content = new FunctionatorWindowControl();
         }
     }
 }

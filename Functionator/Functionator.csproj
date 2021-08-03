@@ -45,14 +45,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MyWindow.cs" />
-    <Compile Include="MyWindowCommand.cs" />
-    <Compile Include="MyWindowControl.xaml.cs">
-      <DependentUpon>MyWindowControl.xaml</DependentUpon>
+    <Compile Include="FunctionatorWindow.cs" />
+    <Compile Include="FunctionatorWindowCommand.cs" />
+    <Compile Include="FunctionatorWindowControl.xaml.cs">
+      <DependentUpon>FunctionatorWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FunctionatorPackage.cs" />
-    <Compile Include="RunFunctionatorCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
@@ -82,11 +81,10 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\MyWindowCommand.png" />
-    <Content Include="Resources\RunFunctionatorCommand.png" />
+    <Content Include="Resources\FunctionatorWindowCommand.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MyWindowControl.xaml">
+    <Page Include="FunctionatorWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

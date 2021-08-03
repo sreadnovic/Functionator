@@ -53,19 +53,12 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidFunctionatorPackageCmdSet" id="RunFunctionatorCommandId" priority="0x0100" type="Button">
-        <Parent guid="guidFunctionatorPackageCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
-        <Strings>
-          <ButtonText>Functionator</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidFunctionatorPackageCmdSet" id="cmdidMyWindowCommand" priority="0x0100" type="Button">
+      <Button guid="guidFunctionatorPackageCmdSet" id="cmdidFunctionatorWindowCommand" priority="0x0100" type="Button">
         <!--<Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />-->
         <Parent guid="guidFunctionatorPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages1" id="bmpPic1" />
         <Strings>
-          <ButtonText>MyWindow</ButtonText>
+          <ButtonText>FunctionatorWindow</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -77,8 +70,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\RunFunctionatorCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages1" href="Resources\MyWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages1" href="Resources\FunctionatorWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
     </Bitmaps>
   </Commands>
 
@@ -89,8 +81,7 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidFunctionatorPackageCmdSet" value="{10711c9f-bd4e-4fe1-9a20-b97c976ad241}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="RunFunctionatorCommandId" value="0x0100" />
-      <IDSymbol value="4129" name="cmdidMyWindowCommand" />
+      <IDSymbol value="4129" name="cmdidFunctionatorWindowCommand" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{881bbb7a-699d-454b-8083-95ad46014790}">

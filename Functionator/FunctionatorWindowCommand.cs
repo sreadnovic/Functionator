@@ -14,7 +14,7 @@ namespace Functionator
     /// <summary>
     /// Command handler
     /// </summary>
-    internal sealed class MyWindowCommand
+    internal sealed class FunctionatorWindowCommand
     {
         /// <summary>
         /// Command ID.
@@ -32,12 +32,12 @@ namespace Functionator
         private readonly Package package;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MyWindowCommand"/> class.
+        /// Initializes a new instance of the <see cref="FunctionatorWindowCommand"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         /// <param name="commandService">Command service to add command to, not null.</param>
-        private MyWindowCommand(AsyncPackage package, OleMenuCommandService commandService)
+        private FunctionatorWindowCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
@@ -50,7 +50,7 @@ namespace Functionator
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static MyWindowCommand Instance
+        public static FunctionatorWindowCommand Instance
         {
             get;
             private set;
@@ -73,12 +73,12 @@ namespace Functionator
         /// <param name="package">Owner package, not null.</param>
         public static async Task InitializeAsync(AsyncPackage package)
         {
-            // Switch to the main thread - the call to AddCommand in MyWindowCommand's constructor requires
+            // Switch to the main thread - the call to AddCommand in FunctionatorWindowCommand's constructor requires
             // the UI thread.
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            Instance = new MyWindowCommand(package, commandService);
+            Instance = new FunctionatorWindowCommand(package, commandService);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Functionator
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
-            ToolWindowPane window = this.package.FindToolWindow(typeof(MyWindow), 0, true);
+            ToolWindowPane window = this.package.FindToolWindow(typeof(FunctionatorWindow), 0, true);
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException("Cannot create tool window");

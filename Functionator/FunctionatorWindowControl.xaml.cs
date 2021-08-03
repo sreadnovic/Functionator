@@ -5,14 +5,14 @@ using System.Windows.Controls;
 namespace Functionator
 {
     /// <summary>
-    /// Interaction logic for MyWindowControl.
+    /// Interaction logic for FunctionatorWindowControl.
     /// </summary>
-    public partial class MyWindowControl : UserControl
+    public partial class FunctionatorWindowControl : UserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MyWindowControl"/> class.
+        /// Initializes a new instance of the <see cref="FunctionatorWindowControl"/> class.
         /// </summary>
-        public MyWindowControl()
+        public FunctionatorWindowControl()
         {
             this.InitializeComponent();
         }
@@ -28,7 +28,7 @@ namespace Functionator
         {
             MessageBox.Show(
                 string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", this.ToString()),
-                "MyWindow");
+                "FunctionatorWindow");
         }
     }
 }
