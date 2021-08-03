@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.VisualStudio.Shell;
 
 namespace Functionator
 {
@@ -9,6 +10,15 @@ namespace Functionator
     /// </summary>
     public partial class FunctionatorWindowControl : UserControl
     {
+        private string _functionName;
+
+        public string FunctionName
+        {
+            get => _functionName;
+            set => _functionName = value;
+        }
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionatorWindowControl"/> class.
         /// </summary>

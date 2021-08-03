@@ -101,6 +101,8 @@ namespace Functionator
 
             TextViewSelection selection = GetSelection(ServiceProvider);
 
+            (window as FunctionatorWindow).SetFunctionName(selection.Text);
+                
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
