@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell;
+using Functionator.Analyzer;
 
 namespace Functionator
 {
@@ -10,6 +11,7 @@ namespace Functionator
     /// </summary>
     public partial class FunctionatorWindowControl : UserControl
     {
+        private Analyzer.Analyzer _analyzer;
         private string _functionName;
 
         public string FunctionName
@@ -17,14 +19,14 @@ namespace Functionator
             get => _functionName;
             set => _functionName = value;
         }
-
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionatorWindowControl"/> class.
         /// </summary>
         public FunctionatorWindowControl()
         {
             this.InitializeComponent();
+            _analyzer = new Analyzer.Analyzer();
         }
 
         /// <summary>
