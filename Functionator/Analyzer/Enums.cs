@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Functionator.Analyzer
+﻿namespace Functionator.Analyzer
 {
-    enum FunctionType
+    internal enum FunctionType
     {
-        Trigger,
+        Caller,
         Orchestrator,
         Activity,
-        SubOrchestrator
+        SubOrchestrator,
+        GenericActivity,
+        GenericSubOrchestrator,
+        Unknown
     }
 }
