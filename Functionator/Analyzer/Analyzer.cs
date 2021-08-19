@@ -8,7 +8,7 @@ namespace Functionator.Analyzer
 {
     internal class Analyzer
     {
-        private const string FunctionAttribute = "[FunctionName(";
+        private const string FunctionAttribute = "[FunctionName(\"";
         private const string StartNewAsyncCall = "StartNewAsync(\"";
         private const string GenericActivityAsyncCall = "CallActivityAsync<";
         private const string RegularActivityAsyncCall = "CallActivityAsync(\"";
@@ -172,13 +172,15 @@ namespace Functionator.Analyzer
             var res = new List<List<string>>();
 
             var children = new List<Function>();
-            GetChildren(functionName, _functions, children);
+            GetChildren(functionName, _functions, ref children);
 
-            foreach (var r in children.Where(x => x.Name.All(char.IsLetterOrDigit) && x.IsOnBottom))
+            foreach (var r in children.Where(x => x.Name.All(char.IsLetterOrDigit)/* && x.IsOnBottom*/))
             {
                 r.IsOnBottom = children.FirstOrDefault(x => x.Caller == r.Name) == null;
 
-                foreach (var combination in GetAllParentsCombinations(children, r.Name))
+                if (!r.IsOnBottom) continue;
+
+                foreach (var combination in GetAllParentsCombinations(r.Name, children))
                 {
                     res.Add(combination.ToList());
                 }
@@ -187,10 +189,15 @@ namespace Functionator.Analyzer
             return res;
         }
 
-        internal IEnumerable<IEnumerable<string>> GetAllParentsCombinations(List<Function> functions, string functionName)
+        internal IEnumerable<IEnumerable<string>> GetAllParentsCombinations(string functionName, List<Function> functions = null)
         {
+            if (functions == null || !functions.Any())
+            {
+                functions = _functions;
+            }
+
             var parents = new List<Function>();
-            GetParents(functionName, functions, parents);
+            GetParents(functionName, ref parents, functions);
 
             parents.Reverse();
 
@@ -232,29 +239,31 @@ namespace Functionator.Analyzer
             }
         }
 
-        private void GetChildren(string functionName, IEnumerable<Function> functions, List<Function> res)
+        private void GetChildren(string functionName, IEnumerable<Function> functions, ref List<Function> res)
         {
-            //res ??= new List<Function>();
-
-            if (res == null) res = new List<Function>();
+            if (res == null || !res.Any()) res = new List<Function>();
 
             var children = functions.Where(x => x.Caller == functionName);
 
             res.AddRange(children);
 
-            foreach (var child in children) GetChildren(child.Name, functions, res);
+            foreach (var child in children) GetChildren(child.Name, functions, ref res);
         }
 
-        private void GetParents(string functionName, IEnumerable<Function> functions, List<Function> res)
+        private void GetParents(string functionName, ref List<Function> res, IEnumerable<Function> functions = null)
         {
-            //res ??= new List<Function>();
-            if (res == null) res = new List<Function>();
+            if (functions == null || !functions.Any())
+            {
+                functions = _functions;
+            }
+
+            if (res == null || !res.Any()) res = new List<Function>();
 
             var parents = functions.Where(x => x.Name == functionName && !string.IsNullOrEmpty(x.Caller));
 
             res.AddRange(parents);
 
-            foreach (var parent in parents) GetParents(parent.Caller, functions, res);
+            foreach (var parent in parents) GetParents(parent.Caller, ref res, functions);
         }
 
         private bool IsValidLine(string line)

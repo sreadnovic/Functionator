@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell;
@@ -27,6 +28,10 @@ namespace Functionator
         {
             this.InitializeComponent();
             _analyzer = new Analyzer.Analyzer();
+
+            int counter = _analyzer.GetAllChildrenCombinations("BatchCalculation").Count();
+
+            //int counter = _analyzer.GetAllParentsCombinations("GetEventDescriptions").Count();
         }
 
         /// <summary>
