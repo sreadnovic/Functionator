@@ -1,50 +1,62 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Microsoft.VisualStudio.Shell;
-using Functionator.Analyzer;
 
 namespace Functionator
 {
     /// <summary>
-    /// Interaction logic for FunctionatorWindowControl.
+    ///     Interaction logic for FunctionatorWindowControl.
     /// </summary>
-    public partial class FunctionatorWindowControl : UserControl
+    public partial class FunctionatorWindowControl
     {
-        private Analyzer.Analyzer _analyzer;
-        private string _functionName;
+        public static readonly DependencyProperty FuncNameProperty = DependencyProperty.Register(
+            nameof(FuncName), typeof(string), typeof(FunctionatorWindowControl),
+            new PropertyMetadata(default(string), OnFuncNameChanged));
 
-        public string FunctionName
-        {
-            get => _functionName;
-            set => _functionName = value;
-        }
-        
+        private readonly Analyzer.Analyzer _analyzer;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionatorWindowControl"/> class.
+        ///     Initializes a new instance of the <see cref="FunctionatorWindowControl" /> class.
         /// </summary>
         public FunctionatorWindowControl()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             _analyzer = new Analyzer.Analyzer();
+            DataContext = this;
+        }
 
-            int counter = _analyzer.GetAllChildrenCombinations("BatchCalculation").Count();
+        public string FuncName
+        {
+            get => (string) GetValue(FuncNameProperty);
+            set => SetValue(FuncNameProperty, value);
+        }
 
-            //int counter = _analyzer.GetAllParentsCombinations("GetEventDescriptions").Count();
+        private static void OnFuncNameChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
+        {
+            (d as FunctionatorWindowControl).AnalyzeThis();
+        }
+
+        public void AnalyzeThis()
+        {
+            var counter1 = _analyzer.GetAllChildrenCombinations("BatchCalculation").Count();
+
+            var counter2 = _analyzer.GetAllParentsCombinations("GetEventDescriptions").Count();
         }
 
         /// <summary>
-        /// Handles click on the button by displaying a message box.
+        ///     Handles click on the button by displaying a message box.
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event args.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Justification = "Sample code")]
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Default event handler naming pattern")]
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter",
+            Justification = "Default event handler naming pattern")]
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", this.ToString()),
+                string.Format(CultureInfo.CurrentUICulture, "Invoked '{0}'", ToString()),
                 "FunctionatorWindow");
         }
     }

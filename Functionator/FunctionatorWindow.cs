@@ -36,7 +36,7 @@ namespace Functionator
 
         public void SetFunctionName(string funtionName)
         {
-            _functionatorWindowControl.FunctionName = funtionName;
+            _functionatorWindowControl.FuncName = funtionName;
         }
     }
 }
