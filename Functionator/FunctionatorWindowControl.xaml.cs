@@ -1,29 +1,42 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 
 namespace Functionator
 {
-    /// <summary>
-    ///     Interaction logic for FunctionatorWindowControl.
-    /// </summary>
     public partial class FunctionatorWindowControl
     {
         public static readonly DependencyProperty FuncNameProperty = DependencyProperty.Register(
             nameof(FuncName), typeof(string), typeof(FunctionatorWindowControl),
             new PropertyMetadata(default(string), OnFuncNameChanged));
 
-        private readonly Analyzer.Analyzer _analyzer;
+        public static readonly DependencyProperty ChildrenProperty = DependencyProperty.Register(
+            nameof(Children), typeof(IEnumerable<IEnumerable<string>>), typeof(FunctionatorWindowControl),
+            new PropertyMetadata(default(IEnumerable<IEnumerable<string>>)));
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="FunctionatorWindowControl" /> class.
-        /// </summary>
+        public static readonly DependencyProperty ParentsProperty = DependencyProperty.Register(
+            nameof(Parents), typeof(IEnumerable<IEnumerable<string>>), typeof(FunctionatorWindowControl),
+            new PropertyMetadata(default(IEnumerable<IEnumerable<string>>)));
+
+        private readonly Analyzer.Analyzer _analyzer;
+        
         public FunctionatorWindowControl()
         {
             InitializeComponent();
             _analyzer = new Analyzer.Analyzer();
-            DataContext = this;
+        }
+
+        public IEnumerable<IEnumerable<string>> Parents
+        {
+            get => (IEnumerable<IEnumerable<string>>) GetValue(ParentsProperty);
+            set => SetValue(ParentsProperty, value);
+        }
+
+        public IEnumerable<IEnumerable<string>> Children
+        {
+            get => (IEnumerable<IEnumerable<string>>) GetValue(ChildrenProperty);
+            set => SetValue(ChildrenProperty, value);
         }
 
         public string FuncName
@@ -35,14 +48,14 @@ namespace Functionator
         private static void OnFuncNameChanged(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            (d as FunctionatorWindowControl).AnalyzeThis();
+            (d as FunctionatorWindowControl)?.AnalyzeThis();
         }
 
         public void AnalyzeThis()
         {
-            var counter1 = _analyzer.GetAllChildrenCombinations("BatchCalculation").Count();
+            Children = _analyzer.GetAllChildrenCombinations("BatchCalculation");
 
-            var counter2 = _analyzer.GetAllParentsCombinations("GetEventDescriptions").Count();
+            Parents = _analyzer.GetAllParentsCombinations("GetEventDescriptions");
         }
 
         /// <summary>

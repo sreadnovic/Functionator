@@ -10,10 +10,51 @@
              d:DesignHeight="300" d:DesignWidth="300"
              Name="FunctionatorToolWindow">
     <Grid>
-        <StackPanel Orientation="Vertical">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ListView Grid.Row="0"
+                  VerticalContentAlignment="Bottom"
+                  ItemsSource="{Binding Path=Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ListView ItemsSource="{Binding}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <Border Padding="10" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock
+                Text="{Binding Path=FuncName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" />
+        </Border>
+
+        <ListView Grid.Row="2"
+                  VerticalContentAlignment="Top"
+                  ItemsSource="{Binding Path=Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ListView ItemsSource="{Binding}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!--<StackPanel Orientation="Vertical">
             <TextBlock Margin="10" HorizontalAlignment="Center">FunctionatorWindow</TextBlock>
             <Button Content="Click me!" Click="button1_Click" Width="120" Height="80" Name="button1" />
-            <TextBlock Text="{Binding Path=FuncName}" />
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </UserControl>
