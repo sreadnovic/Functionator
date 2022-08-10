@@ -1,6 +1,6 @@
 ﻿namespace Functionator.Analyzer
 {
-    internal enum FunctionType
+    public enum FunctionType
     {
         Caller,
         Orchestrator,

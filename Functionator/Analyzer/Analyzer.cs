@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -22,71 +22,78 @@ namespace Functionator.Analyzer
 
         private List<Function> _functions;
 
-        public Analyzer()
+        public Analyzer() => _functions = GetAllFunctions(@"c:\Users\JovanSredanovic\source\repos\i4SEE\");
+
+        public ObservableCollection<Function> GetChildren(string functionName)
         {
-            _functions = GetFunctions();
+            return new(_functions.Where(x => x.Caller == functionName)
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Children = GetChildren(x.Name) }));
         }
 
-        private List<Function> GetFunctions()
+        public ObservableCollection<Function> GetParents(string functionName)
         {
-            var allFiles = Directory
-                .GetFiles("c:\\Users\\JovanSredanovic\\source\\repos\\i4SEE\\", "*", SearchOption.AllDirectories)
-                .Where(x => x.EndsWith(".cs")).ToList();
-            Console.WriteLine(allFiles.Count());
-            
-            var functions = new List<Function>();
+            return new(_functions.Where(x => x.Name == functionName && !string.IsNullOrEmpty(x.Caller))
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Parents = GetParents(x.Caller) }));
+        }
 
-            Function callerFunction = null;
+        private List<Function> GetAllFunctions(string location)
+        {
+            var allFiles = Directory.GetFiles(location, "*", SearchOption.AllDirectories).Where(x => x.EndsWith(".cs")).ToList();
 
-            var completeLineOfCode = string.Empty;
+            return allFiles.Select(GetFileFunctions).SelectMany(x => x).ToList();
+        }
 
-            foreach (var file in allFiles)
+        private List<Function> GetFileFunctions(string file)
+        {
+            var fileFunctions = new List<Function>();
+            string completeLineOfCode = default;
+
+            string callerFunctionName = default;
+            foreach (var line in File.ReadAllLines(file))
             {
-                foreach (var line in File.ReadAllLines(file))
+                var trimmedLine = line.Trim();
+
+                if (!IsValidLine(trimmedLine) && string.IsNullOrEmpty(completeLineOfCode)) continue;
+
+                completeLineOfCode += trimmedLine;
+
+                if (!completeLineOfCode.EndsWith(";")) continue;
+
+                var func = GetFunction(completeLineOfCode, callerFunctionName);
+                if (func.FunctionType == FunctionType.Caller)
                 {
-                    var trimmedLine = line.Trim();
-
-                    if (!IsValidLine(trimmedLine) && string.IsNullOrEmpty(completeLineOfCode))
-                    {
-                        continue;
-                    }
-
-                    completeLineOfCode += trimmedLine;
-
-                    if (!completeLineOfCode.EndsWith(";"))
-                    {
-                        continue;
-                    }
-
-                    var functionType = GetFunctionType(completeLineOfCode);
-
-                    if (functionType == FunctionType.Caller)
-                    {
-                        callerFunction = GetCallerFunction(completeLineOfCode);
-                        functions.Add(callerFunction);
-                    } else
-                    {
-                        functions.Add(GetCalledFunction(completeLineOfCode, callerFunction.Name, functionType));
-                    }
-
-                    completeLineOfCode = string.Empty;
+                    callerFunctionName = func.Name;
                 }
+
+                fileFunctions.Add(func);
+
+                completeLineOfCode = string.Empty;
             }
 
-            return functions;
+            return fileFunctions;
         }
 
-        private static Function GetCallerFunction(string completeLineOfCode)
+        private Function GetFunction(string completeLineOfCode, string callerFunctionName)
         {
-            var functionName = completeLineOfCode.Substring(FunctionAttribute.Length,
-                completeLineOfCode.IndexOf(FunctionAttributeEndString, StringComparison.Ordinal) - FunctionAttribute.Length);
+            string triggerType = default;
+            var functionType = GetFunctionType(completeLineOfCode);
+            if (functionType == FunctionType.Caller)
+            {
+                triggerType = GetCallerFunctionTriggerType(completeLineOfCode);
+                callerFunctionName = default;
+            }
 
-            var triggerType = GetCallerFunctionTriggerType(completeLineOfCode);
-            
-            return new Function(functionName, null, FunctionType.Caller, triggerType);
+            var (start, end) = GetFunctionStringWrappers(functionType);
+
+            var functionNameStart = completeLineOfCode.IndexOf(start, StringComparison.Ordinal) + start.Length;
+            var functionNameEnd = completeLineOfCode.IndexOf(end, StringComparison.Ordinal);
+
+            var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd - functionNameStart);// [functionNameStart..functionNameEnd];
+
+            return new (functionName, callerFunctionName, functionType, triggerType);
         }
 
-        private static string GetCallerFunctionTriggerType(string completeLineOfCode)
+        private string GetCallerFunctionTriggerType(string completeLineOfCode)
         {
             var triggerAttribute = completeLineOfCode.Contains(TriggerAttribute)
                 ? TriggerAttribute
@@ -96,184 +103,39 @@ namespace Functionator.Analyzer
                 completeLineOfCode.IndexOf(triggerAttribute, StringComparison.Ordinal)) + 1;
 
             var triggerNameEnd = completeLineOfCode.IndexOf(triggerAttribute, StringComparison.Ordinal);
-            return completeLineOfCode.Substring(triggerNameStart, triggerNameEnd - triggerNameStart);
+            return completeLineOfCode.Substring(triggerNameStart, triggerNameEnd - triggerNameStart);// [triggerNameStart..triggerNameEnd];
         }
 
-        private static Function GetCalledFunction(string completeLineOfCode, string caller, FunctionType functionType)
-        {
-            var (start, end) = GetFunctionStringWrappers(functionType);
-
-            var functionNameStart = completeLineOfCode.IndexOf(start, StringComparison.Ordinal) + start.Length;
-            var functionNameEnd = completeLineOfCode.IndexOf(end, StringComparison.Ordinal) -
-                                  (completeLineOfCode.IndexOf(start, StringComparison.Ordinal) + start.Length);
-
-            var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd);
-
-            return new Function(functionName, caller, functionType, functionType.ToString());
-        }
-
-        private static (string start, string end) GetFunctionStringWrappers(FunctionType functionType)
-        {
-            if (functionType == FunctionType.Orchestrator)
+        private (string start, string end) GetFunctionStringWrappers(FunctionType functionType) =>
+            functionType switch
             {
-                return (StartNewAsyncCall, FunctionCallEndString);
-            }
-            else if (functionType == FunctionType.Activity)
+                FunctionType.Caller => (FunctionAttribute, FunctionAttributeEndString),
+                FunctionType.Orchestrator => (StartNewAsyncCall, FunctionCallEndString),
+                FunctionType.Activity => (RegularActivityAsyncCall, FunctionCallEndString),
+                FunctionType.GenericActivity => (FunctionCallStartString, FunctionCallEndString),
+                FunctionType.SubOrchestrator => (RegularSubOrchestratorAsyncCall, FunctionCallEndString),
+                FunctionType.GenericSubOrchestrator => (FunctionCallStartString, FunctionCallEndString),
+                _ => (string.Empty, string.Empty)
+            };
+
+        private FunctionType GetFunctionType(string completeLineOfCode) =>
+            completeLineOfCode switch
             {
-                return (RegularActivityAsyncCall, FunctionCallEndString);
-            } 
-            else if (functionType == FunctionType.GenericActivity)
-            {
-                return (FunctionCallStartString, FunctionCallEndString);
-            }
-            else if (functionType == FunctionType.SubOrchestrator)
-            {
-                return (RegularSubOrchestratorAsyncCall, FunctionCallEndString);
-            }
-            else if (functionType == FunctionType.GenericSubOrchestrator)
-            {
-                return (FunctionCallStartString, FunctionCallEndString);
-            }
+                _ when completeLineOfCode.Contains(FunctionAttribute) => FunctionType.Caller,
+                _ when completeLineOfCode.Contains(StartNewAsyncCall) => FunctionType.Orchestrator,
+                _ when completeLineOfCode.Contains(GenericActivityAsyncCall) => FunctionType.GenericActivity,
+                _ when completeLineOfCode.Contains(RegularActivityAsyncCall) => FunctionType.Activity,
+                _ when completeLineOfCode.Contains(GenericSubOrchestratorAsyncCall) => FunctionType.GenericSubOrchestrator,
+                _ when completeLineOfCode.Contains(RegularSubOrchestratorAsyncCall) => FunctionType.SubOrchestrator,
+                _ => FunctionType.Unknown
+            };
 
-            return (string.Empty, string.Empty);
-        }
-
-        private static FunctionType GetFunctionType(string completeLineOfCode)
-        {
-            if (completeLineOfCode.Contains(FunctionAttribute))
-            {
-                return FunctionType.Caller;
-            } else if (completeLineOfCode.Contains(StartNewAsyncCall))
-            {
-                return FunctionType.Orchestrator;
-            }
-            else if (completeLineOfCode.Contains(GenericActivityAsyncCall))
-            {
-                return FunctionType.GenericActivity;
-            }
-            else if (completeLineOfCode.Contains(RegularActivityAsyncCall))
-            {
-                return FunctionType.Activity;
-            }
-            else if (completeLineOfCode.Contains(GenericSubOrchestratorAsyncCall))
-            {
-                return FunctionType.GenericSubOrchestrator;
-            }
-            else if (completeLineOfCode.Contains(RegularSubOrchestratorAsyncCall))
-            {
-                return FunctionType.SubOrchestrator;
-            }
-            
-            return FunctionType.Unknown;
-        }
-
-        internal IEnumerable<IEnumerable<string>> GetAllChildrenCombinations(string functionName)
-        {
-            var res = new List<List<string>>();
-
-            var children = new List<Function>();
-            GetChildren(functionName, _functions, ref children);
-
-            foreach (var r in children.Where(x => x.Name.All(char.IsLetterOrDigit)/* && x.IsOnBottom*/))
-            {
-                r.IsOnBottom = children.FirstOrDefault(x => x.Caller == r.Name) == null;
-
-                if (!r.IsOnBottom) continue;
-
-                foreach (var combination in GetAllParentsCombinations(r.Name, children))
-                {
-                    res.Add(combination.ToList());
-                }
-            }
-
-            return res;
-        }
-
-        internal IEnumerable<IEnumerable<string>> GetAllParentsCombinations(string functionName, List<Function> functions = null)
-        {
-            if (functions == null || !functions.Any())
-            {
-                functions = _functions;
-            }
-
-            var parents = new List<Function>();
-            GetParents(functionName, ref parents, functions);
-
-            parents.Reverse();
-
-            var startingIndexes = new List<int>();
-
-            foreach (var r in parents)
-            {
-                r.IsOnTop = parents.FirstOrDefault(x => x.Name == r.Caller) == null;
-                if (r.IsOnTop)
-                {
-                    startingIndexes.Add(parents.IndexOf(r));
-                }
-            }
-            
-            foreach (var startingIndex in startingIndexes)
-            {
-                var combination = new List<string>();
-
-                Function previous = null;
-
-                foreach (var r in parents.Skip(startingIndex))
-                {
-                    if (startingIndex != parents.IndexOf(r) && r.IsOnTop) continue;
-
-                    if (previous == null)
-                    {
-                        combination.Add(r.Caller);
-                        combination.Add(r.Name);
-                    }
-                    else
-                    {
-                        combination.Add(r.Name != previous.Name ? r.Name : r.Caller);
-                    }
-
-                    previous = r;
-                }
-
-                yield return combination;
-            }
-        }
-
-        private void GetChildren(string functionName, IEnumerable<Function> functions, ref List<Function> res)
-        {
-            if (res == null || !res.Any()) res = new List<Function>();
-
-            var children = functions.Where(x => x.Caller == functionName);
-
-            res.AddRange(children);
-
-            foreach (var child in children) GetChildren(child.Name, functions, ref res);
-        }
-
-        private void GetParents(string functionName, ref List<Function> res, IEnumerable<Function> functions = null)
-        {
-            if (functions == null || !functions.Any())
-            {
-                functions = _functions;
-            }
-
-            if (res == null || !res.Any()) res = new List<Function>();
-
-            var parents = functions.Where(x => x.Name == functionName && !string.IsNullOrEmpty(x.Caller));
-
-            res.AddRange(parents);
-
-            foreach (var parent in parents) GetParents(parent.Caller, ref res, functions);
-        }
-
-        private bool IsValidLine(string line)
-        {
-            return line.Contains(FunctionAttribute)
-                   || line.Contains(StartNewAsyncCall)
-                   || line.Contains(GenericActivityAsyncCall)
-                   || line.Contains(RegularActivityAsyncCall)
-                   || line.Contains(GenericSubOrchestratorAsyncCall)
-                   || line.Contains(RegularSubOrchestratorAsyncCall);
-        }
+        private static bool IsValidLine(string line) =>
+            line.Contains(FunctionAttribute)
+            || line.Contains(StartNewAsyncCall)
+            || line.Contains(GenericActivityAsyncCall)
+            || line.Contains(RegularActivityAsyncCall)
+            || line.Contains(GenericSubOrchestratorAsyncCall)
+            || line.Contains(RegularSubOrchestratorAsyncCall);
     }
 }

@@ -4,57 +4,74 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:analyzer="clr-namespace:Functionator.Analyzer"
+             xmlns:self="clr-namespace:Functionator"
              Background="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}"
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              Name="FunctionatorToolWindow">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        <StackPanel>
+            
+            <!--<TreeView x:Name="ParentsTreeView" ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate x:Key="HdtFunction" DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Caller}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate x:Key="DtFunctionItem">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Caller}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>-->
 
-        <ListView Grid.Row="0"
-                  VerticalContentAlignment="Bottom"
-                  ItemsSource="{Binding Path=Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ListView ItemsSource="{Binding}" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
 
-        <Border Padding="10" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="1"
-                BorderBrush="Black">
-            <TextBlock
-                Text="{Binding Path=FuncName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" />
-        </Border>
+            <TextBlock Text="Children:"/>
+            <TreeView Name="ParentsTreeView" ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <!--<TextBlock Text="{Binding Caller}" />-->
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text="{Binding Children.Count}" Foreground="Blue" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate x:Key="FunctionItem" DataType="{x:Type analyzer:Function}">
+                        <StackPanel Orientation="Horizontal">
+                            <!--<TextBlock Text="{Binding Caller}" />-->
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
 
-        <ListView Grid.Row="2"
-                  VerticalContentAlignment="Top"
-                  ItemsSource="{Binding Path=Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ListView ItemsSource="{Binding}" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
 
-        <!--<StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center">FunctionatorWindow</TextBlock>
-            <Button Content="Click me!" Click="button1_Click" Width="120" Height="80" Name="button1" />
-        </StackPanel>-->
+            <!--<TreeView Name="trvFamilies">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type self:Family}" ItemsSource="{Binding Members}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/WpfTutorialSamples;component/Images/group.png" Margin="0,0,5,0" />
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text=" [" Foreground="Blue" />
+                            <TextBlock Text="{Binding Members.Count}" Foreground="Blue" />
+                            <TextBlock Text="]" Foreground="Blue" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type self:FamilyMember}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/WpfTutorialSamples;component/Images/user.png" Margin="0,0,5,0" />
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text=" (" Foreground="Green" />
+                            <TextBlock Text="{Binding Age}" Foreground="Green" />
+                            <TextBlock Text=" years)" Foreground="Green" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>-->
+        </StackPanel>
     </Grid>
 </UserControl>

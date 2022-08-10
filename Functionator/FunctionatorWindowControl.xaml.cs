@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
+using Functionator.Analyzer;
 
 namespace Functionator
 {
@@ -12,30 +15,30 @@ namespace Functionator
             new PropertyMetadata(default(string), OnFuncNameChanged));
 
         public static readonly DependencyProperty ChildrenProperty = DependencyProperty.Register(
-            nameof(Children), typeof(IEnumerable<IEnumerable<string>>), typeof(FunctionatorWindowControl),
-            new PropertyMetadata(default(IEnumerable<IEnumerable<string>>)));
+            nameof(Children), typeof(ObservableCollection<Function>), typeof(FunctionatorWindowControl),
+            new PropertyMetadata(default(ObservableCollection<Function>)));
 
         public static readonly DependencyProperty ParentsProperty = DependencyProperty.Register(
-            nameof(Parents), typeof(IEnumerable<IEnumerable<string>>), typeof(FunctionatorWindowControl),
-            new PropertyMetadata(default(IEnumerable<IEnumerable<string>>)));
+            nameof(Parents), typeof(IEnumerable<Analyzer.Function>), typeof(FunctionatorWindowControl),
+            new PropertyMetadata(default(IEnumerable<Analyzer.Function>)));
 
         private readonly Analyzer.Analyzer _analyzer;
         
         public FunctionatorWindowControl()
         {
             InitializeComponent();
-            _analyzer = new Analyzer.Analyzer();
+            _analyzer = new();
         }
 
-        public IEnumerable<IEnumerable<string>> Parents
+        public IEnumerable<Analyzer.Function> Parents
         {
-            get => (IEnumerable<IEnumerable<string>>) GetValue(ParentsProperty);
+            get => (IEnumerable<Analyzer.Function>) GetValue(ParentsProperty);
             set => SetValue(ParentsProperty, value);
         }
 
-        public IEnumerable<IEnumerable<string>> Children
+        public ObservableCollection<Function> Children
         {
-            get => (IEnumerable<IEnumerable<string>>) GetValue(ChildrenProperty);
+            get => (ObservableCollection<Function>) GetValue(ChildrenProperty);
             set => SetValue(ChildrenProperty, value);
         }
 
@@ -53,9 +56,28 @@ namespace Functionator
 
         public void AnalyzeThis()
         {
-            Children = _analyzer.GetAllChildrenCombinations("BatchCalculation");
+            Children = new(_analyzer.GetChildren("BatchCalculation"));
 
-            Parents = _analyzer.GetAllParentsCombinations("GetEventDescriptions");
+            //ParentsTreeView.ItemsSource = Children;
+
+            Parents = _analyzer.GetParents("GetEventDescriptions");
+
+            //ParentsTreeView.Items.Clear();
+
+            //List<Family> families = new List<Family>();
+
+            //Family family1 = new Family() { Name = "The Doe's" };
+            //family1.Members.Add(new FamilyMember() { Name = "John Doe", Age = 42 });
+            //family1.Members.Add(new FamilyMember() { Name = "Jane Doe", Age = 39 });
+            //family1.Members.Add(new FamilyMember() { Name = "Sammy Doe", Age = 13 });
+            //families.Add(family1);
+
+            //Family family2 = new Family() { Name = "The Moe's" };
+            //family2.Members.Add(new FamilyMember() { Name = "Mark Moe", Age = 31 });
+            //family2.Members.Add(new FamilyMember() { Name = "Norma Moe", Age = 28 });
+            //families.Add(family2);
+
+            //trvFamilies.ItemsSource = families;
         }
 
         /// <summary>
@@ -72,5 +94,24 @@ namespace Functionator
                 string.Format(CultureInfo.CurrentUICulture, "Invoked '{0}'", ToString()),
                 "FunctionatorWindow");
         }
+    }
+
+    public class Family
+    {
+        public Family()
+        {
+            this.Members = new ObservableCollection<FamilyMember>();
+        }
+
+        public string Name { get; set; }
+
+        public ObservableCollection<FamilyMember> Members { get; set; }
+    }
+
+    public class FamilyMember
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
     }
 }
