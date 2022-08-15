@@ -30,10 +30,60 @@ namespace Functionator.Analyzer
                 .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Children = GetChildren(x.Name) }));
         }
 
-        public ObservableCollection<Function> GetParents(string functionName)
+        private ObservableCollection<Function> GetChildren(string functionName, List<Function> functions)
+        {
+            return new(functions.Where(x => x.Caller == functionName)
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Children = GetChildren(x.Name, functions) }));
+        }
+
+        private ObservableCollection<Function> GetParents(string functionName)
         {
             return new(_functions.Where(x => x.Name == functionName && !string.IsNullOrEmpty(x.Caller))
                 .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Parents = GetParents(x.Caller) }));
+        }
+
+        public ObservableCollection<Function> GetParentsInverted(string functionName)
+        {
+            var parents = GetParents(functionName);
+            List<Function> disassembledParentsHierarchy = default;
+            DisassembleHierarchy(parents, ref disassembledParentsHierarchy);
+
+            var topmostParents = GetTopmostParents(parents).ToList();
+
+            var parentsInverted = new List<Function>();
+
+            foreach (var parent in topmostParents)
+            {
+                parentsInverted.AddRange(GetChildren(parent.Name, disassembledParentsHierarchy));
+            }
+
+            return new(parentsInverted);
+        }
+
+        private IEnumerable<Function> GetTopmostParents(IEnumerable<Function> hierarchy)
+        {
+            foreach (var function in hierarchy)
+            {
+                if (!function.Parents.Any()) yield return function;
+
+                foreach (var item in GetTopmostParents(function.Parents.ToList()))
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        private void DisassembleHierarchy(IEnumerable<Function> hierarchy, ref List<Function> res)
+        {
+            res ??= new();
+
+            if (hierarchy == null) return;
+
+            foreach (var item in hierarchy)
+            {
+                DisassembleHierarchy(item.Parents, ref res);
+                res.Add(item);
+            }
         }
 
         private List<Function> GetAllFunctions(string location)
