@@ -95,7 +95,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\FunctionatorWindowCommand.png" />
     <Content Include="Resources\Icon.png" />
   </ItemGroup>
   <ItemGroup>
