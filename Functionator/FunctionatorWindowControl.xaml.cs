@@ -1,6 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Windows;
 using Functionator.Analyzer;
@@ -66,39 +64,5 @@ namespace Functionator
                 Parents.Add(new (function.Caller, null, default, default) { Children = new (){function} });
             }
         }
-
-        /// <summary>
-        ///     Handles click on the button by displaying a message box.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event args.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Justification = "Sample code")]
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter",
-            Justification = "Default event handler naming pattern")]
-        private void button1_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(
-                string.Format(CultureInfo.CurrentUICulture, "Invoked '{0}'", ToString()),
-                "FunctionatorWindow");
-        }
-    }
-
-    public class Family
-    {
-        public Family()
-        {
-            this.Members = new ObservableCollection<FamilyMember>();
-        }
-
-        public string Name { get; set; }
-
-        public ObservableCollection<FamilyMember> Members { get; set; }
-    }
-
-    public class FamilyMember
-    {
-        public string Name { get; set; }
-
-        public int Age { get; set; }
     }
 }
