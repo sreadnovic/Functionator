@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Functionator.Analyzer;
 
 namespace Functionator
@@ -19,8 +18,8 @@ namespace Functionator
             new PropertyMetadata(default(ObservableCollection<Function>)));
 
         public static readonly DependencyProperty ParentsProperty = DependencyProperty.Register(
-            nameof(Parents), typeof(IEnumerable<Analyzer.Function>), typeof(FunctionatorWindowControl),
-            new PropertyMetadata(default(IEnumerable<Analyzer.Function>)));
+            nameof(Parents), typeof(ObservableCollection<Function>), typeof(FunctionatorWindowControl),
+            new PropertyMetadata(default(ObservableCollection<Function>)));
 
         private readonly Analyzer.Analyzer _analyzer;
         
@@ -30,9 +29,9 @@ namespace Functionator
             _analyzer = new();
         }
 
-        public IEnumerable<Analyzer.Function> Parents
+        public ObservableCollection<Function> Parents
         {
-            get => (IEnumerable<Analyzer.Function>) GetValue(ParentsProperty);
+            get => (ObservableCollection<Function>) GetValue(ParentsProperty);
             set => SetValue(ParentsProperty, value);
         }
 
@@ -56,9 +55,16 @@ namespace Functionator
 
         public void AnalyzeThis()
         {
-            Children = new(_analyzer.GetChildren("BatchCalculation"));
+            var children = new ObservableCollection<Function>(_analyzer.GetChildren("BatchCalculation"));
             
-            Parents = _analyzer.GetParentsInverted("GetEventDescriptions");
+            Children = new () { new (children.First().Caller, null, default, default) { Children = children } };
+
+            Parents = new ();
+
+            foreach (var function in _analyzer.GetParentsInverted("GetEventDescriptions"))
+            {
+                Parents.Add(new (function.Caller, null, default, default) { Children = new (){function} });
+            }
         }
 
         /// <summary>

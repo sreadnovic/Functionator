@@ -20,7 +20,7 @@ namespace Functionator.Analyzer
         private const string TriggerAttribute = "Trigger]";
         private const string TriggerAttributeWithParam = "Trigger(";
 
-        private List<Function> _functions;
+        private readonly List<Function> _functions;
 
         public Analyzer() => _functions = GetAllFunctions(@"c:\Users\JovanSredanovic\source\repos\i4SEE\");
 
