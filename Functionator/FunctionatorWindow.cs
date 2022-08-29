@@ -33,9 +33,10 @@ namespace Functionator
             this.Content = _functionatorWindowControl;
         }
 
-        public void SetFunctionName(string funtionName)
+        public void SetFunctionName(string functionName)
         {
-            _functionatorWindowControl.FuncName = funtionName;
+            _functionatorWindowControl.FuncName = functionName;
+            this.Caption = $"The Functionator - Results Matching '{functionName}'";
         }
     }
 }

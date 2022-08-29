@@ -19,5 +19,6 @@ namespace Functionator.Analyzer
         public string TriggerTypeString { get; set; }
         public ObservableCollection<Function> Children { get; set; }
         public ObservableCollection<Function> Parents { get; set; }
+        public int ChildrenCount => Children?.Count ?? 0;
     }
 }
