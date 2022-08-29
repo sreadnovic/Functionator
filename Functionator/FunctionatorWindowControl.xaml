@@ -25,9 +25,9 @@
                                 <Run Text="{Binding TriggerTypeString}"/>
                                 <Run Text="] "/>
                                 <Run Text="{Binding Name}"/>
-                                <Run Text=" ("/>
-                                <Run Text="{Binding ChildrenCount, Mode=OneWay}"/>
-                                <Run Text=" items)"/>
+                                <Run Text=" (" FontStyle="Italic"/>
+                                <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                                <Run Text=" items)" FontStyle="Italic"/>
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
@@ -54,9 +54,9 @@
                                 <Run Text="{Binding TriggerTypeString}"/>
                                 <Run Text="] "/>
                                 <Run Text="{Binding Name}"/>
-                                <Run Text=" ("/>
-                                <Run Text="{Binding ChildrenCount, Mode=OneWay}"/>
-                                <Run Text=" items)"/>
+                                <Run Text=" (" FontStyle="Italic" />
+                                <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                                <Run Text=" items)" FontStyle="Italic"/>
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
