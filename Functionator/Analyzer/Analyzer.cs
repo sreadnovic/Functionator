@@ -21,9 +21,19 @@ namespace Functionator.Analyzer
         private const string TriggerAttributeWithParam = "Trigger(";
 
         private List<Function> _functions;
-        
-        internal void UpdateFunctions(string projectPath) =>
+
+        internal void UpdateFunctions(string projectPath)
+        {
             _functions = GetAllFunctions(projectPath);
+
+            foreach (var item in _functions)
+            {
+                if (string.IsNullOrEmpty(item.TriggerTypeString))
+                {
+                    item.TriggerTypeString = GetFunctionTriggerType(item.Name);
+                }
+            }
+        }
 
         public ObservableCollection<Function> GetChildren(string functionName)
         {
@@ -91,23 +101,11 @@ namespace Functionator.Analyzer
         {
             var allFiles = Directory.GetFiles(location, "*", SearchOption.AllDirectories).Where(x => x.EndsWith(".cs")).ToList();
 
-            var allFunctions = allFiles.Select(GetFileFunctions).SelectMany(x => x).ToList();
-
-            FillTriggerType(allFunctions);
-
-            return allFunctions;
+            return allFiles.Select(GetFileFunctions).SelectMany(x => x).ToList();
         }
 
-        private void FillTriggerType(List<Function> functions)
-        {
-            foreach (var item in functions)
-            {
-                if (string.IsNullOrEmpty(item.TriggerTypeString))
-                {
-                    item.TriggerTypeString = functions.FirstOrDefault(x => x.Name == item.Name && !string.IsNullOrEmpty(x.TriggerTypeString))?.TriggerTypeString;
-                }
-            }
-        }
+        internal string GetFunctionTriggerType(string functionName) =>
+            _functions.FirstOrDefault(x => x.Name == functionName && !string.IsNullOrEmpty(x.TriggerTypeString))?.TriggerTypeString;
 
         private List<Function> GetFileFunctions(string file)
         {

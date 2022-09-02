@@ -51,22 +51,22 @@ namespace Functionator
         private static async void OnFuncNameChanged(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            await (d as FunctionatorWindowControl)!.AnalyzeThis();
+            await (d as FunctionatorWindowControl)!.AnalyzeThisAsync();
         }
 
-        internal async Task AnalyzeThis()
+        internal async Task AnalyzeThisAsync()
         {
             await UpdateFunctionsAsync();
 
             var children = new ObservableCollection<Function>(_analyzer.GetChildren("BatchCalculation"));
             
-            Children = new () { new (children.First().Caller, null, default, default) { Children = children } };
+            Children = new () { new (children.First().Caller, null, default, _analyzer.GetFunctionTriggerType(children.First().Caller)) { Children = children } };
 
             Parents = new ();
 
             foreach (var function in _analyzer.GetParentsInverted("GetEventDescriptions"))
             {
-                Parents.Add(new (function.Caller, null, default, default) { Children = new (){function} });
+                Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller)) { Children = new (){function} });
             }
         }
 
