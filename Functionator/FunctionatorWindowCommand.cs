@@ -2,10 +2,6 @@
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
-using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
-using EnvDTE;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Task = System.Threading.Tasks.Task;
 
@@ -101,7 +97,7 @@ namespace Functionator
 
             TextViewSelection selection = GetSelection(ServiceProvider);
 
-            (window as FunctionatorWindow).SetFunctionName(selection.Text);
+            (window as FunctionatorWindow)!.SetFunctionName(selection.Text);
                 
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
@@ -123,19 +119,17 @@ namespace Functionator
  
         private TextViewSelection GetSelection(IServiceProvider serviceProvider)
         {
-            var service = serviceProvider.GetService(typeof(SVsTextManager));
-            var textManager = service as IVsTextManager2;
-            IVsTextView view;
-            int result = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
- 
-            view.GetSelection(out int startLine, out int startColumn, out int endLine, out int endColumn);//end could be before beginning
+            var textManagerService = serviceProvider.GetService(typeof(SVsTextManager));
+            var textManager = textManagerService as IVsTextManager2;
+            textManager!.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out var view);
+            
+            view.GetSelection(out var startLine, out var startColumn, out var endLine, out var endColumn);//end could be before beginning
             var start = new TextViewPosition(startLine, startColumn);
             var end = new TextViewPosition(endLine, endColumn);
  
-            view.GetSelectedText(out string selectedText);
+            view.GetSelectedText(out var selectedText);
  
-            TextViewSelection selection = new TextViewSelection(start, end, selectedText);
-            return selection;
+            return new (start, end, selectedText);
         }
  
         public struct TextViewPosition
@@ -194,11 +188,6 @@ namespace Functionator
             {
                 return a > b ? a : b;
             }
-        }
-        private string GetActiveFilePath(IServiceProvider serviceProvider)
-        {
-            EnvDTE80.DTE2 applicationObject = serviceProvider.GetService(typeof(DTE)) as EnvDTE80.DTE2;
-            return applicationObject.ActiveDocument.FullName;
         }
     }
 }

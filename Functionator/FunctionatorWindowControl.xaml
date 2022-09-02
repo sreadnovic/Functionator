@@ -22,7 +22,7 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>
                                 <Run Text="["/>
-                                <Run Text="{Binding TriggerTypeString}"/>
+                                <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
                                 <Run Text="] "/>
                                 <Run Text="{Binding Name}"/>
                                 <Run Text=" (" FontStyle="Italic"/>
@@ -51,7 +51,7 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>
                                 <Run Text="["/>
-                                <Run Text="{Binding TriggerTypeString}"/>
+                                <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
                                 <Run Text="] "/>
                                 <Run Text="{Binding Name}"/>
                                 <Run Text=" (" FontStyle="Italic" />

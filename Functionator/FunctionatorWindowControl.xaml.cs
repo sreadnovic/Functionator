@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using Community.VisualStudio.Toolkit;
 using Functionator.Analyzer;
 
 namespace Functionator
@@ -45,14 +48,16 @@ namespace Functionator
             set => SetValue(FuncNameProperty, value);
         }
 
-        private static void OnFuncNameChanged(DependencyObject d,
+        private static async void OnFuncNameChanged(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
-            (d as FunctionatorWindowControl)?.AnalyzeThis();
+            await (d as FunctionatorWindowControl)!.AnalyzeThis();
         }
 
-        public void AnalyzeThis()
+        internal async Task AnalyzeThis()
         {
+            await UpdateFunctionsAsync();
+
             var children = new ObservableCollection<Function>(_analyzer.GetChildren("BatchCalculation"));
             
             Children = new () { new (children.First().Caller, null, default, default) { Children = children } };
@@ -63,6 +68,17 @@ namespace Functionator
             {
                 Parents.Add(new (function.Caller, null, default, default) { Children = new (){function} });
             }
+        }
+
+        private async Task UpdateFunctionsAsync()
+        {
+            var activeDocument = await VS.Documents.GetActiveDocumentViewAsync();
+
+            var physicalFile = await PhysicalFile.FromFileAsync(activeDocument!.FilePath!);
+
+            var path = physicalFile!.ContainingProject;
+            
+            _analyzer.UpdateFunctions(Path.GetDirectoryName(path!.FullPath));
         }
     }
 }
