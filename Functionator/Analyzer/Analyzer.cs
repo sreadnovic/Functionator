@@ -25,7 +25,7 @@ namespace Functionator.Analyzer
         internal void UpdateFunctions(string projectPath)
         {
             _functions = GetAllFunctions(projectPath);
-
+            
             foreach (var item in _functions)
             {
                 if (string.IsNullOrEmpty(item.TriggerTypeString))
@@ -75,7 +75,7 @@ namespace Functionator.Analyzer
         {
             foreach (var function in hierarchy)
             {
-                if (!function.Parents.Any()) yield return function;
+                if (!function.Parents.Any()) yield return GetFunction(function.Caller);
 
                 foreach (var item in GetTopmostParents(function.Parents.ToList()))
                 {
@@ -83,6 +83,9 @@ namespace Functionator.Analyzer
                 }
             }
         }
+
+        private Function GetFunction(string functionName) =>
+            _functions.FirstOrDefault(x => x.Name == functionName);
 
         private void DisassembleHierarchy(IEnumerable<Function> hierarchy, ref List<Function> res)
         {
@@ -106,7 +109,7 @@ namespace Functionator.Analyzer
 
         internal string GetFunctionTriggerType(string functionName) =>
             _functions.FirstOrDefault(x => x.Name == functionName && !string.IsNullOrEmpty(x.TriggerTypeString))?.TriggerTypeString;
-
+        
         private List<Function> GetFileFunctions(string file)
         {
             var fileFunctions = new List<Function>();
