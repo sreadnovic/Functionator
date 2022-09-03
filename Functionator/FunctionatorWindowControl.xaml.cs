@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using Community.VisualStudio.Toolkit;
 using Functionator.Analyzer;
+using Microsoft.VisualStudio.Shell;
+using EnvDTE;
 
 namespace Functionator
 {
@@ -23,11 +25,13 @@ namespace Functionator
             new PropertyMetadata(default(ObservableCollection<Function>)));
 
         private readonly Analyzer.Analyzer _analyzer;
+        private readonly DTE _dte;
         
         public FunctionatorWindowControl()
         {
             InitializeComponent();
             _analyzer = new();
+            _dte = (DTE)Package.GetGlobalService(typeof(DTE));
         }
 
         public ObservableCollection<Function> Parents
@@ -56,6 +60,10 @@ namespace Functionator
 
         internal async Task AnalyzeThisAsync()
         {
+            //await VS.Documents.OpenAsync("C:\\Users\\JovanSredanovic\\source\\repos\\i4SEE\\i4SEE\\i4SEE.Functions\\InputApi\\DiagnosisEngineFunction.cs");
+            //var ts = _dte.ActiveDocument.Selection as TextSelection;
+            //ts.MoveToLineAndOffset(55, 1);
+
             await UpdateFunctionsAsync();
 
             var children = new ObservableCollection<Function>(_analyzer.GetChildren("BatchCalculation"));
@@ -68,6 +76,8 @@ namespace Functionator
             {
                 Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller)) { Children = new (){function} });
             }
+            
+            
         }
 
         private async Task UpdateFunctionsAsync()

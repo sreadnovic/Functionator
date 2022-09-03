@@ -55,13 +55,7 @@ namespace Functionator
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.package;
-            }
-        }
+        private IServiceProvider ServiceProvider => this.package;
 
         /// <summary>
         /// Initializes the singleton instance of the command.
@@ -128,7 +122,6 @@ namespace Functionator
             var end = new TextViewPosition(endLine, endColumn);
  
             view.GetSelectedText(out var selectedText);
- 
             return new (start, end, selectedText);
         }
  
