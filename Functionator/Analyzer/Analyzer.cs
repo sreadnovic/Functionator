@@ -102,7 +102,7 @@ namespace Functionator.Analyzer
 
         private List<Function> GetAllFunctions(string location)
         {
-            var allFiles = Directory.GetFiles(location, "*", SearchOption.AllDirectories).Where(x => x.EndsWith(".cs")).ToList();
+            var allFiles = Directory.GetFiles(location, "*.cs", SearchOption.AllDirectories);
 
             return allFiles.Select(GetFileFunctions).SelectMany(x => x).ToList();
         }
@@ -116,25 +116,38 @@ namespace Functionator.Analyzer
             string completeLineOfCode = default;
 
             string callerFunctionName = default;
-            foreach (var line in File.ReadAllLines(file))
+            foreach (var line in File.ReadAllLines(file).Where(x => !string.IsNullOrEmpty(x)))
             {
                 var trimmedLine = line.Trim();
-
-                if (!IsValidLine(trimmedLine) && string.IsNullOrEmpty(completeLineOfCode)) continue;
-
-                completeLineOfCode += trimmedLine;
-
-                if (!completeLineOfCode.EndsWith(";")) continue;
-
-                var func = GetFunction(completeLineOfCode, callerFunctionName);
-                if (func.FunctionType == FunctionType.Caller)
+                Function func = null;
+                
+                if (GetFunctionType(trimmedLine) == FunctionType.Caller)
                 {
+                    completeLineOfCode += trimmedLine;
+                    func = GetFunction(completeLineOfCode, default);
                     callerFunctionName = func.Name;
+
+                    fileFunctions.Add(func);
+                    completeLineOfCode = string.Empty;
                 }
+                else if (trimmedLine.Contains(TriggerAttribute) || trimmedLine.Contains("Trigger(")) // second use case is for timer trigger
+                {
+                    var triggerType = GetCallerFunctionTriggerType(trimmedLine);
+                    fileFunctions.Last(x => x.FunctionType == FunctionType.Caller).TriggerTypeString = triggerType;
+                }
+                else
+                {
+                    if (!IsValidLine(trimmedLine) && string.IsNullOrEmpty(completeLineOfCode)) continue;
 
-                fileFunctions.Add(func);
+                    completeLineOfCode += trimmedLine;
 
-                completeLineOfCode = string.Empty;
+                    if (!completeLineOfCode.EndsWith(";")) continue;
+
+                    func = GetFunction(completeLineOfCode, callerFunctionName);
+
+                    fileFunctions.Add(func);
+                    completeLineOfCode = string.Empty;
+                }
             }
 
             return fileFunctions;
@@ -142,22 +155,32 @@ namespace Functionator.Analyzer
 
         private Function GetFunction(string completeLineOfCode, string callerFunctionName)
         {
-            string triggerType = default;
-            var functionType = GetFunctionType(completeLineOfCode);
-            if (functionType == FunctionType.Caller)
+            try
             {
-                triggerType = GetCallerFunctionTriggerType(completeLineOfCode);
-                callerFunctionName = default;
+                var functionType = GetFunctionType(completeLineOfCode);
+                var wrappers = GetFunctionStringWrappers(functionType);
+
+                var functionNameStart = 0;
+                var functionNameEnd = 0;
+
+                foreach (var wrapper in wrappers)
+                {
+                    functionNameStart = completeLineOfCode.IndexOf(wrapper.start, StringComparison.Ordinal) + wrapper.start.Length;
+                    functionNameEnd = completeLineOfCode.IndexOf(wrapper.end, StringComparison.Ordinal);
+
+                    if (functionNameStart != -1 && functionNameEnd != -1) break;
+                }
+                
+                var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd - functionNameStart);// [functionNameStart..functionNameEnd];
+
+                return new (functionName, callerFunctionName, functionType, default);
             }
+            catch (Exception e)
+            {
 
-            var (start, end) = GetFunctionStringWrappers(functionType);
-
-            var functionNameStart = completeLineOfCode.IndexOf(start, StringComparison.Ordinal) + start.Length;
-            var functionNameEnd = completeLineOfCode.IndexOf(end, StringComparison.Ordinal);
-
-            var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd - functionNameStart);// [functionNameStart..functionNameEnd];
-
-            return new (functionName, callerFunctionName, functionType, triggerType);
+            }
+            
+            return null;
         }
 
         private string GetCallerFunctionTriggerType(string completeLineOfCode)
@@ -173,22 +196,23 @@ namespace Functionator.Analyzer
             return completeLineOfCode.Substring(triggerNameStart, triggerNameEnd - triggerNameStart);// [triggerNameStart..triggerNameEnd];
         }
 
-        private (string start, string end) GetFunctionStringWrappers(FunctionType functionType) =>
+        private IEnumerable<(string start, string end)> GetFunctionStringWrappers(FunctionType functionType) =>
             functionType switch
             {
-                FunctionType.Caller => (FunctionAttribute, FunctionAttributeEndString),
-                FunctionType.Orchestrator => (StartNewAsyncCall, FunctionCallEndString),
-                FunctionType.Activity => (RegularActivityAsyncCall, FunctionCallEndString),
-                FunctionType.GenericActivity => (FunctionCallStartString, FunctionCallEndString),
-                FunctionType.SubOrchestrator => (RegularSubOrchestratorAsyncCall, FunctionCallEndString),
-                FunctionType.GenericSubOrchestrator => (FunctionCallStartString, FunctionCallEndString),
-                _ => (string.Empty, string.Empty)
+                FunctionType.Caller => new() { (FunctionAttribute, FunctionAttributeEndString) } ,
+                FunctionType.Orchestrator => new() { (StartNewAsyncCall, FunctionCallEndString), (StartNewAsyncCall, "\")") },
+                FunctionType.Activity => new() { (RegularActivityAsyncCall, FunctionCallEndString) },
+                FunctionType.GenericActivity => new() { (FunctionCallStartString, FunctionCallEndString) },
+                FunctionType.SubOrchestrator => new() { (RegularSubOrchestratorAsyncCall, FunctionCallEndString) },
+                FunctionType.GenericSubOrchestrator => new() { (FunctionCallStartString, FunctionCallEndString) },
+                _ => new List<(string, string)> { (string.Empty, string.Empty)}
             };
 
         private FunctionType GetFunctionType(string completeLineOfCode) =>
             completeLineOfCode switch
             {
                 _ when completeLineOfCode.Contains(FunctionAttribute) => FunctionType.Caller,
+                _ when completeLineOfCode.Contains("[FunctionName($\"") => FunctionType.Caller,
                 _ when completeLineOfCode.Contains(StartNewAsyncCall) => FunctionType.Orchestrator,
                 _ when completeLineOfCode.Contains(GenericActivityAsyncCall) => FunctionType.GenericActivity,
                 _ when completeLineOfCode.Contains(RegularActivityAsyncCall) => FunctionType.Activity,
