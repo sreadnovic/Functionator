@@ -68,13 +68,13 @@ namespace Functionator
 
             var children = new ObservableCollection<Function>(_analyzer.GetChildren("BatchCalculation"));
             
-            Children = new () { new (children.First().Caller, null, default, _analyzer.GetFunctionTriggerType(children.First().Caller)) { Children = children } };
+            Children = new () { new (children.First().Caller, null, default, _analyzer.GetFunctionTriggerType(children.First().Caller), children.First().FilePath, children.First().LineNumber) { Children = children } };
 
             Parents = new ();
 
             foreach (var function in _analyzer.GetParentsInverted("GetEventDescriptions"))
             {
-                Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller)) { Children = new (){function} });
+                Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new (){function} });
             }
             
             

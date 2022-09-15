@@ -38,19 +38,19 @@ namespace Functionator.Analyzer
         public ObservableCollection<Function> GetChildren(string functionName)
         {
             return new(_functions.Where(x => x.Caller == functionName)
-                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Children = GetChildren(x.Name) }));
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, default, default) { Children = GetChildren(x.Name) }));
         }
 
         private ObservableCollection<Function> GetChildren(string functionName, List<Function> functions)
         {
             return new(functions.Where(x => x.Caller == functionName)
-                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Children = GetChildren(x.Name, functions) }));
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, default, default) { Children = GetChildren(x.Name, functions) }));
         }
 
         private ObservableCollection<Function> GetParents(string functionName)
         {
             return new(_functions.Where(x => x.Name == functionName && !string.IsNullOrEmpty(x.Caller))
-                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString) { Parents = GetParents(x.Caller) }));
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, default, default) { Parents = GetParents(x.Caller) }));
         }
 
         public ObservableCollection<Function> GetParentsInverted(string functionName)
@@ -116,15 +116,20 @@ namespace Functionator.Analyzer
             string completeLineOfCode = default;
 
             string callerFunctionName = default;
-            foreach (var line in File.ReadAllLines(file).Where(x => !string.IsNullOrEmpty(x)))
+            var lineNumber = 0;
+            foreach (var line in File.ReadAllLines(file))
             {
+                lineNumber++;
                 var trimmedLine = line.Trim();
+
+                if (string.IsNullOrEmpty(trimmedLine)) continue;
+
                 Function func = null;
                 
                 if (GetFunctionType(trimmedLine) == FunctionType.Caller)
                 {
                     completeLineOfCode += trimmedLine;
-                    func = GetFunction(completeLineOfCode, default);
+                    func = GetFunction(completeLineOfCode, default, file, lineNumber);
                     callerFunctionName = func.Name;
 
                     fileFunctions.Add(func);
@@ -143,7 +148,7 @@ namespace Functionator.Analyzer
 
                     if (!completeLineOfCode.EndsWith(";")) continue;
 
-                    func = GetFunction(completeLineOfCode, callerFunctionName);
+                    func = GetFunction(completeLineOfCode, callerFunctionName, file, lineNumber);
 
                     fileFunctions.Add(func);
                     completeLineOfCode = string.Empty;
@@ -153,7 +158,7 @@ namespace Functionator.Analyzer
             return fileFunctions;
         }
 
-        private Function GetFunction(string completeLineOfCode, string callerFunctionName)
+        private Function GetFunction(string completeLineOfCode, string callerFunctionName, string filePath, int lineNumber)
         {
             try
             {
@@ -173,7 +178,7 @@ namespace Functionator.Analyzer
                 
                 var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd - functionNameStart);// [functionNameStart..functionNameEnd];
 
-                return new (functionName, callerFunctionName, functionType, default);
+                return new (functionName, callerFunctionName, functionType, default, filePath, lineNumber);
             }
             catch (Exception e)
             {

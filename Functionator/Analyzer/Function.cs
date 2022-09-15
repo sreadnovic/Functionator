@@ -5,12 +5,14 @@ namespace Functionator.Analyzer
 {
     public class Function
     {
-        public Function(string name, string caller, FunctionType functionType, string triggerTypeString)
+        public Function(string name, string caller, FunctionType functionType, string triggerTypeString, string filePath, int lineNumber)
         {
             Name = name;
             Caller = caller;
             FunctionType = functionType;
             TriggerTypeString = triggerTypeString;
+            FilePath = filePath;
+            LineNumber = lineNumber;
         }
 
         public string Name { get; set; }
@@ -20,5 +22,7 @@ namespace Functionator.Analyzer
         public ObservableCollection<Function> Children { get; set; }
         public ObservableCollection<Function> Parents { get; set; }
         public int ChildrenCount => Children?.Count ?? 0;
+        public string FilePath { get; set; }
+        public int LineNumber { get; set; }
     }
 }
