@@ -60,10 +60,6 @@ namespace Functionator
 
         internal async Task AnalyzeThisAsync()
         {
-            //await VS.Documents.OpenAsync("C:\\Users\\JovanSredanovic\\source\\repos\\i4SEE\\i4SEE\\i4SEE.Functions\\InputApi\\DiagnosisEngineFunction.cs");
-            //var ts = _dte.ActiveDocument.Selection as TextSelection;
-            //ts.MoveToLineAndOffset(55, 1);
-
             await UpdateFunctionsAsync();
 
             var children = new ObservableCollection<Function>(_analyzer.GetChildren("BatchCalculation"));
@@ -76,8 +72,6 @@ namespace Functionator
             {
                 Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new (){function} });
             }
-            
-            
         }
 
         private async Task UpdateFunctionsAsync()
@@ -89,6 +83,37 @@ namespace Functionator
             var path = physicalFile!.ContainingProject;
             
             _analyzer.UpdateFunctions(Path.GetDirectoryName(path!.FullPath));
+        }
+
+        private async void ParentsGoToUsageButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            await GoToAsync(ParentsTreeView.SelectedItem as Function);
+        }
+
+        private async void ParentsGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            await GoToAsync(ParentsTreeView.SelectedItem as Function);
+        }
+
+        private async void ChildrenGoToUsageButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            await GoToAsync(ChildrenTreeView.SelectedItem as Function);
+        }
+
+        private async void ChildrenGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            await GoToAsync(ChildrenTreeView.SelectedItem as Function);
+        }
+
+        private async Task GoToAsync(Function function)
+        {
+            if (function == null) return;
+
+            if (string.IsNullOrEmpty(function.FilePath) || function.LineNumber == default) return;
+
+            await VS.Documents.OpenAsync(function.FilePath);
+            var ts = _dte.ActiveDocument.Selection as TextSelection;
+            ts.MoveToLineAndOffset(function.LineNumber, 1);
         }
     }
 }

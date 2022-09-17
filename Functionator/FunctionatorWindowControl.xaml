@@ -11,31 +11,29 @@
         <StackPanel Orientation="Vertical">
 
             <TextBlock Text="Parents" FontWeight="Bold"/>
-
+            
             <Separator />
+
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="ParentsGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ParentsGoToUsageButton_OnClick"/>
+                <Button x:Name="ParentsGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ParentsGoToDefinitionButton_OnClick" />
+            </StackPanel>
 
             <TreeView Name="ParentsTreeView"
                       BorderThickness="0"
                       ItemsSource="{Binding Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock>
-                                <Run Text="["/>
-                                <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
-                                <Run Text="] "/>
-                                <Run Text="{Binding Name}"/>
-                                <Run Text=" (" FontStyle="Italic"/>
-                                <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
-                                <Run Text=" items)" FontStyle="Italic"/>
-                            </TextBlock>
-                        </StackPanel>
+                        <TextBlock>
+                            <Run Text="["/>
+                            <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
+                            <Run Text="] "/>
+                            <Run Text="{Binding Name}"/>
+                            <Run Text=" (" FontStyle="Italic"/>
+                            <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                            <Run Text=" items)" FontStyle="Italic"/>
+                        </TextBlock>
                     </HierarchicalDataTemplate>
-                    <DataTemplate x:Key="FunctionItem" DataType="{x:Type analyzer:Function}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" />
-                        </StackPanel>
-                    </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
 
@@ -43,28 +41,26 @@
 
             <Separator />
 
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="ChildrenGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ChildrenGoToUsageButton_OnClick"/>
+                <Button x:Name="ChildrenGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ChildrenGoToDefinitionButton_OnClick"/>
+            </StackPanel>
+
             <TreeView Name="ChildrenTreeView"
                       BorderThickness="0"
                       ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock>
-                                <Run Text="["/>
-                                <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
-                                <Run Text="] "/>
-                                <Run Text="{Binding Name}"/>
-                                <Run Text=" (" FontStyle="Italic" />
-                                <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
-                                <Run Text=" items)" FontStyle="Italic"/>
-                            </TextBlock>
-                        </StackPanel>
+                        <TextBlock>
+                            <Run Text="["/>
+                            <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
+                            <Run Text="] "/>
+                            <Run Text="{Binding Name}"/>
+                            <Run Text=" (" FontStyle="Italic" />
+                            <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                            <Run Text=" items)" FontStyle="Italic"/>
+                        </TextBlock>
                     </HierarchicalDataTemplate>
-                    <DataTemplate x:Key="FunctionItem" DataType="{x:Type analyzer:Function}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" />
-                        </StackPanel>
-                    </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
         </StackPanel>

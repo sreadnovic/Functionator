@@ -38,19 +38,19 @@ namespace Functionator.Analyzer
         public ObservableCollection<Function> GetChildren(string functionName)
         {
             return new(_functions.Where(x => x.Caller == functionName)
-                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, default, default) { Children = GetChildren(x.Name) }));
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, x.FilePath, x.LineNumber) { Children = GetChildren(x.Name) }));
         }
 
         private ObservableCollection<Function> GetChildren(string functionName, List<Function> functions)
         {
             return new(functions.Where(x => x.Caller == functionName)
-                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, default, default) { Children = GetChildren(x.Name, functions) }));
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, x.FilePath, x.LineNumber) { Children = GetChildren(x.Name, functions) }));
         }
 
         private ObservableCollection<Function> GetParents(string functionName)
         {
             return new(_functions.Where(x => x.Name == functionName && !string.IsNullOrEmpty(x.Caller))
-                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, default, default) { Parents = GetParents(x.Caller) }));
+                .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, x.FilePath, x.LineNumber) { Parents = GetParents(x.Caller) }));
         }
 
         public ObservableCollection<Function> GetParentsInverted(string functionName)
