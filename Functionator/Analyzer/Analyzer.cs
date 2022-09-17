@@ -35,6 +35,10 @@ namespace Functionator.Analyzer
             }
         }
 
+        internal Function GetFunctionDefinition(Function function) =>
+            _functions.FirstOrDefault(x => x.Name == function.Name && x.FunctionType == FunctionType.Caller);
+        
+
         public ObservableCollection<Function> GetChildren(string functionName)
         {
             return new(_functions.Where(x => x.Caller == functionName)

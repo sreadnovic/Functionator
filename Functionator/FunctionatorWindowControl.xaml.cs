@@ -85,25 +85,19 @@ namespace Functionator
             _analyzer.UpdateFunctions(Path.GetDirectoryName(path!.FullPath));
         }
 
-        private async void ParentsGoToUsageButton_OnClick(object sender, RoutedEventArgs e)
-        {
+        private async void ParentsGoToUsageButton_OnClick(object sender, RoutedEventArgs e) =>
             await GoToAsync(ParentsTreeView.SelectedItem as Function);
-        }
+        
 
-        private async void ParentsGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            await GoToAsync(ParentsTreeView.SelectedItem as Function);
-        }
+        private async void ParentsGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e) =>
+            await GoToAsync(_analyzer.GetFunctionDefinition(ParentsTreeView.SelectedItem as Function));
+        
 
-        private async void ChildrenGoToUsageButton_OnClick(object sender, RoutedEventArgs e)
-        {
+        private async void ChildrenGoToUsageButton_OnClick(object sender, RoutedEventArgs e) =>
             await GoToAsync(ChildrenTreeView.SelectedItem as Function);
-        }
 
-        private async void ChildrenGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            await GoToAsync(ChildrenTreeView.SelectedItem as Function);
-        }
+        private async void ChildrenGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e) =>
+            await GoToAsync(_analyzer.GetFunctionDefinition(ChildrenTreeView.SelectedItem as Function));
 
         private async Task GoToAsync(Function function)
         {
