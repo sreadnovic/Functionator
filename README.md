@@ -24,11 +24,15 @@ This information is used to build the call hierarchy.
 # Useful resources
 
 Official Microsoft's Visual Studio extensibility documentation home page:
+
 https://learn.microsoft.com/en-us/visualstudio/extensibility/?view=vs-2022
 
 Docs, samples, tips & tricks
+
 https://www.visualstudioextensibility.com/
+
 https://www.vsixcookbook.com/
 
 Toolkit that accelerates Visual Studio extensions development:
+
 https://github.com/VsixCommunity/Community.VisualStudio.Toolkit
