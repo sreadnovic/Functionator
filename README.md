@@ -21,6 +21,10 @@ E.g. Every function is decorated with *FunctionName* attribute (the definition),
 
 This information is used to build the call hierarchy.
 
+Analysis of one file:
+
+![File analysis diagram](https://user-images.githubusercontent.com/7647183/190891326-cdef78ae-1845-4ae1-af11-f594704be50c.jpg)
+
 # Useful resources
 
 Official Microsoft's Visual Studio extensibility documentation home page:
