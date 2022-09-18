@@ -13,7 +13,22 @@ Based on the file where the functionality has been activated, it finds usages of
 From the hierarchical view, it is possible to navigate to the Azure Function's usage (as displayed in the hierarchy) or to it's definition.
 
 # How it works
-Text analyzer that checks .cs files of a project.
-Finds everything that fits into Azure Functions definition or usage pattern.
-E.g. Every function is decorated with *FunctionName* attribute (the definition), and in itself, it can call other functions using e.g. context.CallActivity, context.CallSubOrchestrator (the usages).
+This is a text analyzer that checks .cs files of a project.
+
+It finds everything that fits into Azure Functions definition or usage pattern.
+
+E.g. Every function is decorated with *FunctionName* attribute (the definition), and in itself, it can call other functions using e.g. *context.CallActivity*, *context.CallSubOrchestrator* (the usages).
+
 This information is used to build the call hierarchy.
+
+# Useful resources
+
+Official Microsoft's Visual Studio extensibility documentation home page:
+https://learn.microsoft.com/en-us/visualstudio/extensibility/?view=vs-2022
+
+Docs, samples, tips & tricks
+https://www.visualstudioextensibility.com/
+https://www.vsixcookbook.com/
+
+Toolkit that accelerates Visual Studio extensions development:
+https://github.com/VsixCommunity/Community.VisualStudio.Toolkit
