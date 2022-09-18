@@ -62,15 +62,21 @@ namespace Functionator
         {
             await UpdateFunctionsAsync();
 
-            var children = new ObservableCollection<Function>(_analyzer.GetChildren("BatchCalculation"));
-            
-            Children = new () { new (children.First().Caller, null, default, _analyzer.GetFunctionTriggerType(children.First().Caller), children.First().FilePath, children.First().LineNumber) { Children = children } };
+            var children = _analyzer.GetChildren(FuncName);
 
-            Parents = new ();
-
-            foreach (var function in _analyzer.GetParentsInverted("GetEventDescriptions"))
+            if (children != null && children.Any())
             {
-                Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new (){function} });
+                Children = new () { new (children.First().Caller, null, default, _analyzer.GetFunctionTriggerType(children.First().Caller), children.First().FilePath, children.First().LineNumber) { Children = children } };
+            }
+
+            Parents = new (_analyzer.GetParentsInverted(FuncName));
+
+            if (Parents != null && Parents.Any())
+            {
+                foreach (var function in _analyzer.GetParentsInverted(FuncName))
+                {
+                    Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new (){function} });
+                }
             }
         }
 
