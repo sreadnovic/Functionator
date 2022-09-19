@@ -7,6 +7,9 @@
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
              toolkit:Themes.UseVsTheme="True">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical">
 
@@ -14,55 +17,68 @@
             
             <Separator />
 
-            <StackPanel Orientation="Horizontal">
-                <Button x:Name="ParentsGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ParentsGoToUsageButton_OnClick"/>
-                <Button x:Name="ParentsGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ParentsGoToDefinitionButton_OnClick" />
-            </StackPanel>
+            <Grid>
+                <StackPanel Visibility="{Binding AnyParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal" >
+                        <Button x:Name="ParentsGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ParentsGoToUsageButton_OnClick"/>
+                        <Button x:Name="ParentsGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ParentsGoToDefinitionButton_OnClick" />
+                    </StackPanel>
 
-            <TreeView Name="ParentsTreeView"
-                      BorderThickness="0"
-                      ItemsSource="{Binding Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
-                        <TextBlock>
-                            <Run Text="["/>
-                            <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
-                            <Run Text="] "/>
-                            <Run Text="{Binding Name}"/>
-                            <Run Text=" (" FontStyle="Italic"/>
-                            <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
-                            <Run Text=" items)" FontStyle="Italic"/>
-                        </TextBlock>
-                    </HierarchicalDataTemplate>
-                </TreeView.Resources>
-            </TreeView>
+                    <TreeView Name="ParentsTreeView"
+                              BorderThickness="0"
+                              ItemsSource="{Binding Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
+                                <TextBlock>
+                                    <Run Text="["/>
+                                    <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
+                                    <Run Text="] "/>
+                                    <Run Text="{Binding Name}"/>
+                                    <Run Text=" (" FontStyle="Italic"/>
+                                    <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                                    <Run Text=" items)" FontStyle="Italic"/>
+                                </TextBlock>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </StackPanel>
+
+                <TextBlock Visibility="{Binding NoParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Text="No parents found!"/>
+            </Grid>
 
             <TextBlock Text="Children" FontWeight="Bold"/>
 
             <Separator />
 
-            <StackPanel Orientation="Horizontal">
-                <Button x:Name="ChildrenGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ChildrenGoToUsageButton_OnClick"/>
-                <Button x:Name="ChildrenGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ChildrenGoToDefinitionButton_OnClick"/>
-            </StackPanel>
+            <Grid>
+                <StackPanel Visibility="{Binding AnyChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="ChildrenGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ChildrenGoToUsageButton_OnClick"/>
+                        <Button x:Name="ChildrenGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ChildrenGoToDefinitionButton_OnClick"/>
+                    </StackPanel>
 
-            <TreeView Name="ChildrenTreeView"
-                      BorderThickness="0"
-                      ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
-                        <TextBlock>
-                            <Run Text="["/>
-                            <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
-                            <Run Text="] "/>
-                            <Run Text="{Binding Name}"/>
-                            <Run Text=" (" FontStyle="Italic" />
-                            <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
-                            <Run Text=" items)" FontStyle="Italic"/>
-                        </TextBlock>
-                    </HierarchicalDataTemplate>
-                </TreeView.Resources>
-            </TreeView>
+                    <TreeView Name="ChildrenTreeView"
+                              BorderThickness="0"
+                              ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
+                                <TextBlock>
+                                    <Run Text="["/>
+                                    <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
+                                    <Run Text="] "/>
+                                    <Run Text="{Binding Name}"/>
+                                    <Run Text=" (" FontStyle="Italic" />
+                                    <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                                    <Run Text=" items)" FontStyle="Italic"/>
+                                </TextBlock>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </StackPanel>
+                
+                <TextBlock Visibility="{Binding NoChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Text="No children found!"/>
+            </Grid>
+
         </StackPanel>
     </Grid>
 </UserControl>

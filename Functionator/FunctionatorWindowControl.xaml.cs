@@ -24,6 +24,19 @@ namespace Functionator
             nameof(Parents), typeof(ObservableCollection<Function>), typeof(FunctionatorWindowControl),
             new PropertyMetadata(default(ObservableCollection<Function>)));
 
+        
+        public static readonly DependencyProperty AnyChildrenProperty = DependencyProperty.Register(
+            nameof(AnyChildren), typeof(bool), typeof(FunctionatorWindowControl), new PropertyMetadata(default(bool)));
+
+        public static readonly DependencyProperty AnyParentsProperty = DependencyProperty.Register(
+            nameof(AnyParents), typeof(bool), typeof(FunctionatorWindowControl), new PropertyMetadata(default(bool)));
+
+        public static readonly DependencyProperty NoChildrenProperty = DependencyProperty.Register(
+            nameof(NoChildren), typeof(bool), typeof(FunctionatorWindowControl), new PropertyMetadata(default(bool)));
+
+        public static readonly DependencyProperty NoParentsProperty = DependencyProperty.Register(
+            nameof(NoParents), typeof(bool), typeof(FunctionatorWindowControl), new PropertyMetadata(default(bool)));
+
         private readonly Analyzer.Analyzer _analyzer;
         private readonly DTE _dte;
         
@@ -52,6 +65,30 @@ namespace Functionator
             set => SetValue(FuncNameProperty, value);
         }
 
+        public bool AnyChildren
+        {
+            get => (bool)GetValue(AnyChildrenProperty);
+            set => SetValue(AnyChildrenProperty, value);
+        }
+
+        public bool AnyParents
+        {
+            get => (bool)GetValue(AnyParentsProperty);
+            set => SetValue(AnyParentsProperty, value);
+        }
+
+        public bool NoChildren
+        {
+            get => (bool)GetValue(NoChildrenProperty);
+            set => SetValue(NoChildrenProperty, value);
+        }
+
+        public bool NoParents
+        {
+            get => (bool)GetValue(NoParentsProperty);
+            set => SetValue(NoParentsProperty, value);
+        }
+
         private static async void OnFuncNameChanged(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
@@ -62,11 +99,18 @@ namespace Functionator
         {
             await UpdateFunctionsAsync();
 
+            AnyChildren = default;
+            AnyParents = default;
+            NoChildren = true;
+            NoParents = true;
+
             var children = _analyzer.GetChildren(FuncName);
 
             if (children != null && children.Any())
             {
                 Children = new () { new (children.First().Caller, null, default, _analyzer.GetFunctionTriggerType(children.First().Caller), children.First().FilePath, children.First().LineNumber) { Children = children } };
+                AnyChildren = true;
+                NoChildren = false;
             }
 
             Parents = new (_analyzer.GetParentsInverted(FuncName));
@@ -77,6 +121,9 @@ namespace Functionator
                 {
                     Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new (){function} });
                 }
+
+                AnyParents = true;
+                NoParents = false;
             }
         }
 
