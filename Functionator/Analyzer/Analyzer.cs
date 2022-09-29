@@ -6,9 +6,10 @@ using System.Linq;
 
 namespace Functionator.Analyzer
 {
-    internal class Analyzer
+    public class Analyzer
     {
         private const string FunctionAttribute = "[FunctionName(\"";
+        private const string FunctionAttributeInterpolated = "[FunctionName($\"";
         private const string StartNewAsyncCall = "StartNewAsync(\"";
         private const string GenericActivityAsyncCall = "CallActivityAsync<";
         private const string RegularActivityAsyncCall = "CallActivityAsync(\"";
@@ -22,7 +23,7 @@ namespace Functionator.Analyzer
 
         private List<Function> _functions;
 
-        internal void UpdateFunctions(string projectPath)
+        public void UpdateFunctions(string projectPath)
         {
             _functions = GetAllFunctions(projectPath);
             
@@ -221,7 +222,7 @@ namespace Functionator.Analyzer
             completeLineOfCode switch
             {
                 _ when completeLineOfCode.Contains(FunctionAttribute) => FunctionType.Caller,
-                _ when completeLineOfCode.Contains("[FunctionName($\"") => FunctionType.Caller,
+                _ when completeLineOfCode.Contains(FunctionAttributeInterpolated) => FunctionType.Caller,
                 _ when completeLineOfCode.Contains(StartNewAsyncCall) => FunctionType.Orchestrator,
                 _ when completeLineOfCode.Contains(GenericActivityAsyncCall) => FunctionType.GenericActivity,
                 _ when completeLineOfCode.Contains(RegularActivityAsyncCall) => FunctionType.Activity,
