@@ -64,7 +64,7 @@ namespace Functionator.Analyzer
             List<Function> disassembledParentsHierarchy = default;
             DisassembleHierarchy(parents, ref disassembledParentsHierarchy);
 
-            var topmostParents = GetTopmostParents(parents).ToList();
+            var topmostParents = GetTopmostParents(parents).Distinct().ToList();
 
             var parentsInverted = new List<Function>();
 
@@ -72,6 +72,8 @@ namespace Functionator.Analyzer
             {
                 parentsInverted.AddRange(GetChildren(parent.Name, disassembledParentsHierarchy));
             }
+
+            parentsInverted = parentsInverted.GroupBy(x => x.Name).Select(x => x.First()).ToList();
 
             return new(parentsInverted);
         }

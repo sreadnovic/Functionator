@@ -113,13 +113,15 @@ namespace Functionator
                 NoChildren = false;
             }
 
-            Parents = new (_analyzer.GetParentsInverted(FuncName));
+            var prnts = _analyzer.GetParentsInverted(FuncName);
 
-            if (Parents != null && Parents.Any())
+            if (prnts != null && prnts.Any())
             {
-                foreach (var function in _analyzer.GetParentsInverted(FuncName))
+                Parents = new();
+
+                foreach (var function in prnts)
                 {
-                    Parents.Add(new (function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new (){function} });
+                    Parents.Add(new(function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new() { function } });
                 }
 
                 AnyParents = true;
