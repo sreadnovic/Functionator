@@ -5,6 +5,8 @@ namespace Functionator.Analyzer
 {
     public class Function
     {
+        public Function() { }
+
         public Function(string name, string caller, FunctionType functionType, string triggerTypeString, string filePath, int lineNumber)
         {
             Name = name;

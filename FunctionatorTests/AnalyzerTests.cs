@@ -23,45 +23,30 @@ namespace FunctionatorTests
         [Test]
         public void Analyzer_GetChildren_HasChildren()
         {
-            var filePath = "..\\..\\..\\..\\FunctionsForTesting\\DurableFunction.cs";
-            var callerName = "DurableFunction";
             var children = _analyzer.GetChildren("DurableFunction");
-
             Assert.That(children.Count, Is.EqualTo(4));
-
-            Assert.That(children[0].Name, Is.EqualTo("ActivityFunction_Hello"));
-            Assert.That(children[0].FilePath, Is.EqualTo(filePath));
-            Assert.That(children[0].Caller, Is.EqualTo(callerName));
-            Assert.That(children[0].LineNumber, Is.EqualTo(16));
-            Assert.That(children[0].TriggerTypeString, Is.EqualTo("Activity"));
-            Assert.That(children[0].FunctionType, Is.EqualTo(FunctionType.GenericActivity));
-            Assert.That(children[0].ChildrenCount, Is.EqualTo(0));
-
-            Assert.That(children[1].Name, Is.EqualTo("ActivityFunction_Hello"));
-            Assert.That(children[1].FilePath, Is.EqualTo(filePath));
-            Assert.That(children[1].Caller, Is.EqualTo(callerName));
-            Assert.That(children[1].LineNumber, Is.EqualTo(17));
-            Assert.That(children[1].TriggerTypeString, Is.EqualTo("Activity"));
-            Assert.That(children[1].FunctionType, Is.EqualTo(FunctionType.GenericActivity));
-            Assert.That(children[1].ChildrenCount, Is.EqualTo(0));
-
-            Assert.That(children[2].Name, Is.EqualTo("ActivityFunction_Hello"));
-            Assert.That(children[2].FilePath, Is.EqualTo(filePath));
-            Assert.That(children[2].Caller, Is.EqualTo(callerName));
-            Assert.That(children[2].LineNumber, Is.EqualTo(18));
-            Assert.That(children[2].TriggerTypeString, Is.EqualTo("Activity"));
-            Assert.That(children[2].FunctionType, Is.EqualTo(FunctionType.GenericActivity));
-            Assert.That(children[2].ChildrenCount, Is.EqualTo(0));
-
-            Assert.That(children[3].Name, Is.EqualTo("AnotherDurableFunction"));
-            Assert.That(children[3].FilePath, Is.EqualTo(filePath));
-            Assert.That(children[3].Caller, Is.EqualTo(callerName));
-            Assert.That(children[3].LineNumber, Is.EqualTo(20));
-            Assert.That(children[3].TriggerTypeString, Is.EqualTo("Orchestration"));
-            Assert.That(children[3].FunctionType, Is.EqualTo(FunctionType.SubOrchestrator));
-            Assert.That(children[3].ChildrenCount, Is.EqualTo(3));
         }
 
+        [Test]
+        public void Analyzer_GetChildren_ChildrenAreGeneratedAsExpected()
+        {
+            const string filePath = "..\\..\\..\\..\\FunctionsForTesting\\DurableFunction.cs";
+            const string callerName = "DurableFunction";
+            var children = _analyzer.GetChildren("DurableFunction");
+            
+            var referenceFunction = new Function("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 16);
+            children[0].AssertFunctionProperties(referenceFunction);
+
+            referenceFunction = new("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 17);
+            children[1].AssertFunctionProperties(referenceFunction);
+            
+            referenceFunction = new("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 18);
+            children[2].AssertFunctionProperties(referenceFunction);
+
+            referenceFunction = new("AnotherDurableFunction", callerName, FunctionType.SubOrchestrator, "Orchestration", filePath, 20){Children = new(){new(), new(), new()}};
+            children[3].AssertFunctionProperties(referenceFunction);
+        }
+        
         [Test]
         public void Analyzer_GetParents_NoParents()
         {
