@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace FunctionsForTesting;
 
-public static class DurableFunction
+public static class GreetingsDurableFunction
 {
-    [FunctionName("DurableFunction")]
+    [FunctionName("GreetingsDurableFunction")]
     public static async Task RunOrchestrator(
         [OrchestrationTrigger] IDurableOrchestrationContext context)
     {
@@ -17,7 +17,7 @@ public static class DurableFunction
         await context.CallActivityAsync<string>("ActivityFunction_Hello", "Seattle");
         await context.CallActivityAsync<string>("ActivityFunction_Hello", "London");
 
-        await context.CallSubOrchestratorAsync("AnotherDurableFunction", null);
+        await context.CallSubOrchestratorAsync("GoodbyeDurableFunction", null);
     }
 
     [FunctionName("ActivityFunction_Hello")]
@@ -27,15 +27,14 @@ public static class DurableFunction
         return $"Hello {name}!";
     }
 
-    [FunctionName("TriggerFunction_HttpStart")]
+    [FunctionName("GreetingsTriggerFunction_HttpStart")]
     public static async Task<HttpResponseMessage> HttpStart(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]
         HttpRequestMessage req,
         [DurableClient] IDurableOrchestrationClient starter,
         ILogger log)
     {
-        // Function input comes from the request content.
-        var instanceId = await starter.StartNewAsync("DurableFunction");
+        var instanceId = await starter.StartNewAsync("GreetingsDurableFunction");
 
         log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
