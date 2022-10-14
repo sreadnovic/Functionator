@@ -24,7 +24,7 @@ jobs:
     - name: Setup .NET build dependencies
       uses: timheuer/bootstrap-dotnet@v1
       with:
-        nuget: 'false'
+        nuget: 'true'
         sdk: 'false'
         msbuild: 'true'
         
