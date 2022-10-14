@@ -40,4 +40,4 @@ jobs:
       run: msbuild /v:m -restore /p:OutDir=\_built
 
     - name: Test
-      run: ./NUnit.ConsoleRunner.3.12.0/tools/nunit3-console.exe FunctionatorTests\bin\Debug\FunctionatorTests.dll
+      run: ./NUnit.ConsoleRunner.3.15.2/tools/nunit3-console.exe FunctionatorTests\bin\Debug\FunctionatorTests.dll
