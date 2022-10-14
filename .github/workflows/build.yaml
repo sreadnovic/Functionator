@@ -41,10 +41,10 @@ jobs:
       run: nuget restore Functionator.sln
       
     - name: Build
-      run: msbuild /v:m -restore /p:OutDir=\_built      
+      run: msbuild /v:m -restore /p:OutDir=\_built
 
-    - name: Setup test
-      run: darenm/Setup-VSTest@v1
+    - name: Setup VSTest Path
+      uses: darenm/Setup-VSTest@v1
 
     - name: Test
       run: vstest.console.exe \_built\*test.dll
