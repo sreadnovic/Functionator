@@ -38,15 +38,6 @@ jobs:
 
     - name: Build
       run: msbuild /v:m -restore /p:OutDir=\_built
-      
-    - name: Setup test
-      uses: darenm/Setup-VSTest@v1
 
     - name: Test
-      run: vstest.console.exe \_built\*test.dll
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ github.event.repository.name }}.vsix
-        path: /_built/**/*.vsix
+      run: packages\NUnit.ConsoleRunner.3.12.0\tools\nunit3-console.exe TestProject\bin\Debug\TestProject.dll
