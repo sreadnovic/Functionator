@@ -36,6 +36,12 @@ jobs:
         
     - name: Build
       run: msbuild /v:m -restore /p:OutDir=\_built
+      
+    - name: Nuget
+      uses: nuget/setup-nuget@v1
+    
+    - name: Restore packages
+      run: nuget restore FunctionatorUnitTests\FunctionatorUnitTests.csproj
 
     - name: Setup test
       run: darenm/Setup-VSTest@v1
