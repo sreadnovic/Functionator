@@ -12,7 +12,7 @@ namespace FunctionatorUnitTests
         public AnalyzerTests()
         {
             _analyzer = new Analyzer();
-            _analyzer.UpdateFunctions(@"..\..\..\_built\FunctionsForTesting");
+            _analyzer.UpdateFunctions(@"..\..\..\a\FunctionsForTesting");
         }
 
         [TestMethod]
@@ -32,7 +32,7 @@ namespace FunctionatorUnitTests
         [TestMethod]
         public void Analyzer_GetChildren_ChildrenAreGeneratedAsExpected()
         {
-            const string filePath = "..\\..\\..\\_built\\FunctionsForTesting\\GreetingsDurableFunction.cs";
+            const string filePath = "..\\..\\..\\a\\FunctionsForTesting\\GreetingsDurableFunction.cs";
             const string callerName = "GreetingsDurableFunction";
             var children = _analyzer.GetChildren("GreetingsDurableFunction");
 
