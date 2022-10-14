@@ -32,7 +32,7 @@ namespace FunctionatorUnitTests
         [TestMethod]
         public void Analyzer_GetChildren_ChildrenAreGeneratedAsExpected()
         {
-            const string filePath = "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs";
+            const string filePath = @"D:\a\Functionator\Functionator\FunctionsForTesting\GreetingsDurableFunction.cs";
             const string callerName = "GreetingsDurableFunction";
             var children = _analyzer.GetChildren("GreetingsDurableFunction");
 
@@ -70,12 +70,12 @@ namespace FunctionatorUnitTests
 
             var parents = _analyzer.GetParentsInverted(functionName);
 
-            var referenceFunction = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 35);
+            var referenceFunction = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", @"D:\a\Functionator\Functionator\FunctionsForTesting\GoodbyeDurableFunction.cs", 35);
             parents[0].AssertFunctionProperties(referenceFunction);
 
-            var referenceChild = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, "Orchestration", "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 20);
+            var referenceChild = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, "Orchestration", @"D:\a\Functionator\Functionator\FunctionsForTesting\GreetingsDurableFunction.cs", 20);
 
-            referenceFunction = new Function("GreetingsDurableFunction", "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 37) { Children = new ObservableCollection<Function> { referenceChild } };
+            referenceFunction = new Function("GreetingsDurableFunction", "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", @"D:\a\Functionator\Functionator\FunctionsForTesting\GreetingsDurableFunction.cs", 37) { Children = new ObservableCollection<Function> { referenceChild } };
             parents[1].AssertFunctionProperties(referenceFunction);
             parents[1].Children[0].AssertFunctionProperties(referenceChild);
         }
