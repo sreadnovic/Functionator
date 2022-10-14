@@ -1,6 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "Build"
-
 on:
   push:
     branches: [master]
@@ -22,31 +21,22 @@ jobs:
       
     steps:
     - uses: actions/checkout@v2
-
     - name: Setup .NET build dependencies
       uses: timheuer/bootstrap-dotnet@v1
       with:
         nuget: 'false'
         sdk: 'false'
         msbuild: 'true'
-
     - name: Increment VSIX version
       id: vsix_version
       uses: timheuer/vsix-version-stamp@v1
       with:
         manifest-file: ${{ env.VsixManifestPath }}
-
     - name: Build
       run: msbuild /v:m -restore /p:OutDir=\_built
       
-    - name: Setup test
-      uses: darenm/Setup-VSTest@v1
+    - name: Install NUnit.ConsoleRunner
+      run: nuget install NUnit.ConsoleRunner -Version 3.15.2 -DirectDownload -OutputDirectory .
 
     - name: Test
-      run: vstest.console.exe \_built\*test.dll
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ github.event.repository.name }}.vsix
-        path: /_built/**/*.vsix
+      run: ./NUnit.ConsoleRunner.3.15.2/tools/nunit3-console.exe FunctionatorTests\bin\Debug\FunctionatorTests.dll
