@@ -24,9 +24,7 @@ jobs:
     - name: Setup .NET build dependencies
       uses: timheuer/bootstrap-dotnet@v1
       with:
-        nuget: 'false'
-        sdk: 'false'
-        msbuild: 'true'
+        dotnet-version: 6.0.x
     - name: Increment VSIX version
       id: vsix_version
       uses: timheuer/vsix-version-stamp@v1
