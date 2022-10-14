@@ -24,7 +24,7 @@ jobs:
     - name: Setup .NET build dependencies
       uses: timheuer/bootstrap-dotnet@v1
       with:
-        nuget: 'true'
+        nuget: 'false'
         sdk: 'false'
         msbuild: 'true'
         
@@ -32,13 +32,7 @@ jobs:
       id: vsix_version
       uses: timheuer/vsix-version-stamp@v1
       with:
-        manifest-file: ${{ env.VsixManifestPath }}      
-      
-    - name: Nuget
-      uses: nuget/setup-nuget@v1
-    
-    - name: Restore packages
-      run: nuget restore FunctionatorUnitTests\FunctionatorUnitTests.csproj
+        manifest-file: ${{ env.VsixManifestPath }}
       
     - name: Build
       run: msbuild /v:m -restore /p:OutDir=\_built      
