@@ -33,6 +33,12 @@ jobs:
       uses: timheuer/vsix-version-stamp@v1
       with:
         manifest-file: ${{ env.VsixManifestPath }}
+        
+    - name: Setup Nuget
+      uses: Nuget/setup-nuget@v1
+      
+    - name: Restore nuget packages
+      run: nuget restore Functionator.sln
       
     - name: Build
       run: msbuild /v:m -restore /p:OutDir=\_built      
