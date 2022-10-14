@@ -12,7 +12,7 @@ namespace FunctionatorUnitTests
         public AnalyzerTests()
         {
             _analyzer = new Analyzer();
-            _analyzer.UpdateFunctions(@"..\..\..\FunctionsForTesting");
+            _analyzer.UpdateFunctions(@"D:\a\Functionator\Functionator\\FunctionsForTesting");
         }
 
         [TestMethod]
