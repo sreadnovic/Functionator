@@ -32,16 +32,16 @@ jobs:
       id: vsix_version
       uses: timheuer/vsix-version-stamp@v1
       with:
-        manifest-file: ${{ env.VsixManifestPath }}
-        
-    - name: Build
-      run: msbuild /v:m -restore /p:OutDir=\_built
+        manifest-file: ${{ env.VsixManifestPath }}      
       
     - name: Nuget
       uses: nuget/setup-nuget@v1
     
     - name: Restore packages
       run: nuget restore FunctionatorUnitTests\FunctionatorUnitTests.csproj
+      
+    - name: Build
+      run: msbuild /v:m -restore /p:OutDir=\_built      
 
     - name: Setup test
       run: darenm/Setup-VSTest@v1
