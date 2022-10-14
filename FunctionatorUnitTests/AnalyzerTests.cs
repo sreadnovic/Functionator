@@ -9,10 +9,17 @@ namespace FunctionatorUnitTests
     {
         private readonly Analyzer _analyzer;
 
+        private readonly string _functionsForTestingPathPrefix = @"D:\a\Functionator\Functionator\";
+        
+
         public AnalyzerTests()
         {
+            #if DEBUG
+            _functionsForTestingPathPrefix = @"..\..\..\";
+            #endif
+
             _analyzer = new Analyzer();
-            _analyzer.UpdateFunctions(@"D:\a\Functionator\Functionator\FunctionsForTesting");
+            _analyzer.UpdateFunctions($"{_functionsForTestingPathPrefix}FunctionsForTesting");
         }
 
         [TestMethod]
@@ -32,7 +39,7 @@ namespace FunctionatorUnitTests
         [TestMethod]
         public void Analyzer_GetChildren_ChildrenAreGeneratedAsExpected()
         {
-            const string filePath = @"D:\a\Functionator\Functionator\FunctionsForTesting\GreetingsDurableFunction.cs";
+            var filePath = $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs";
             const string callerName = "GreetingsDurableFunction";
             var children = _analyzer.GetChildren("GreetingsDurableFunction");
 
@@ -70,12 +77,12 @@ namespace FunctionatorUnitTests
 
             var parents = _analyzer.GetParentsInverted(functionName);
 
-            var referenceFunction = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", @"D:\a\Functionator\Functionator\FunctionsForTesting\GoodbyeDurableFunction.cs", 35);
+            var referenceFunction = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 35);
             parents[0].AssertFunctionProperties(referenceFunction);
 
-            var referenceChild = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, "Orchestration", @"D:\a\Functionator\Functionator\FunctionsForTesting\GreetingsDurableFunction.cs", 20);
+            var referenceChild = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 20);
 
-            referenceFunction = new Function("GreetingsDurableFunction", "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", @"D:\a\Functionator\Functionator\FunctionsForTesting\GreetingsDurableFunction.cs", 37) { Children = new ObservableCollection<Function> { referenceChild } };
+            referenceFunction = new Function("GreetingsDurableFunction", "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 37) { Children = new ObservableCollection<Function> { referenceChild } };
             parents[1].AssertFunctionProperties(referenceFunction);
             parents[1].Children[0].AssertFunctionProperties(referenceChild);
         }
