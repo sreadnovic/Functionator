@@ -43,4 +43,4 @@ jobs:
       run: nuget install NUnit.ConsoleRunner -Version 3.15.2 -DirectDownload -OutputDirectory .
 
     - name: Test
-      run: ./NUnit.ConsoleRunner.3.15.2/tools/nunit3-console.exe Functionator\FunctionatorTests\bin\Debug\FunctionatorTests.dll
+      run: ./NUnit.ConsoleRunner.3.15.2/tools/nunit3-console.exe .\FunctionatorTests\bin\Debug\FunctionatorTests.dll
