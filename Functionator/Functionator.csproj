@@ -50,6 +50,7 @@
     <Compile Include="Analyzer\Analyzer.cs" />
     <Compile Include="Analyzer\Enums.cs" />
     <Compile Include="Analyzer\Function.cs" />
+    <Compile Include="Common\Converters\BooleanToVisibilityInvertedConverter.cs" />
     <Compile Include="FunctionatorWindow.cs" />
     <Compile Include="FunctionatorWindowCommand.cs" />
     <Compile Include="FunctionatorWindowControl.xaml.cs">

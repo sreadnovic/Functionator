@@ -6,9 +6,11 @@
              Background="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}"
              Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
              xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+             xmlns:converters="clr-namespace:Functionator.Common.Converters"
              toolkit:Themes.UseVsTheme="True">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:BooleanToVisibilityInvertedConverter x:Key="BooleanToVisibilityInvertedConverter"/>
     </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical">
@@ -43,7 +45,7 @@
                     </TreeView>
                 </StackPanel>
 
-                <TextBlock Visibility="{Binding NoParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Text="No parents found!"/>
+                <TextBlock Visibility="{Binding AnyParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityInvertedConverter}}" Text="No parents found!"/>
             </Grid>
 
             <TextBlock Text="Children" FontWeight="Bold"/>
@@ -76,7 +78,7 @@
                     </TreeView>
                 </StackPanel>
                 
-                <TextBlock Visibility="{Binding NoChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" Text="No children found!"/>
+                <TextBlock Visibility="{Binding AnyChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityInvertedConverter}}" Text="No children found!"/>
             </Grid>
 
         </StackPanel>

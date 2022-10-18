@@ -31,12 +31,6 @@ namespace Functionator
         public static readonly DependencyProperty AnyParentsProperty = DependencyProperty.Register(
             nameof(AnyParents), typeof(bool), typeof(FunctionatorWindowControl), new PropertyMetadata(default(bool)));
 
-        public static readonly DependencyProperty NoChildrenProperty = DependencyProperty.Register(
-            nameof(NoChildren), typeof(bool), typeof(FunctionatorWindowControl), new PropertyMetadata(default(bool)));
-
-        public static readonly DependencyProperty NoParentsProperty = DependencyProperty.Register(
-            nameof(NoParents), typeof(bool), typeof(FunctionatorWindowControl), new PropertyMetadata(default(bool)));
-
         private readonly Analyzer.Analyzer _analyzer;
         private readonly DTE _dte;
         
@@ -77,18 +71,6 @@ namespace Functionator
             set => SetValue(AnyParentsProperty, value);
         }
 
-        public bool NoChildren
-        {
-            get => (bool)GetValue(NoChildrenProperty);
-            set => SetValue(NoChildrenProperty, value);
-        }
-
-        public bool NoParents
-        {
-            get => (bool)GetValue(NoParentsProperty);
-            set => SetValue(NoParentsProperty, value);
-        }
-
         private static async void OnFuncNameChanged(DependencyObject d,
             DependencyPropertyChangedEventArgs e)
         {
@@ -101,24 +83,12 @@ namespace Functionator
 
             AnyChildren = default;
             AnyParents = default;
-            NoChildren = true;
-            NoParents = true;
 
             Children = _analyzer.GetChildrenHierarchy(FuncName);
-
-            if (Children != null && Children.Any())
-            {
-                AnyChildren = true;
-                NoChildren = false;
-            }
+            AnyChildren = Children != null && Children.Any();
 
             Parents = _analyzer.GetParentsHierarchy(FuncName);
-
-            if (Parents != null && Parents.Any())
-            {
-                AnyParents = true;
-                NoParents = false;
-            }
+            AnyParents = Parents != null && Parents.Any();
         }
 
         private async Task UpdateFunctionsAsync()
