@@ -38,9 +38,22 @@ namespace Functionator.Analyzer
 
         internal Function GetFunctionDefinition(Function function) =>
             _functions.FirstOrDefault(x => x.Name == function.Name && x.FunctionType == FunctionType.Caller);
-        
 
-        public ObservableCollection<Function> GetChildren(string functionName)
+        public ObservableCollection<Function> GetChildrenHierarchy(string functionName)
+        {
+            var res = new ObservableCollection<Function>();
+
+            var children = GetChildren(functionName);
+
+            if (children != null && children.Any())
+            {
+                res = new () { new (children.First().Caller, null, default, GetFunctionTriggerType(children.First().Caller), children.First().FilePath, children.First().LineNumber) { Children = children } };
+            }
+
+            return res;
+        }
+
+        private ObservableCollection<Function> GetChildren(string functionName)
         {
             return new(_functions.Where(x => x.Caller == functionName)
                 .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, x.FilePath, x.LineNumber) { Children = GetChildren(x.Name) }));
@@ -58,7 +71,7 @@ namespace Functionator.Analyzer
                 .Select(x => new Function(x.Name, x.Caller, x.FunctionType, x.TriggerTypeString, x.FilePath, x.LineNumber) { Parents = GetParents(x.Caller) }));
         }
 
-        public ObservableCollection<Function> GetParentsInverted(string functionName)
+        public ObservableCollection<Function> GetParentsHierarchy(string functionName)
         {
             var parents = GetParents(functionName);
             List<Function> disassembledParentsHierarchy = default;
@@ -75,7 +88,14 @@ namespace Functionator.Analyzer
 
             parentsInverted = parentsInverted.GroupBy(x => x.Name).Select(x => x.First()).ToList();
 
-            return new(parentsInverted);
+            var res = new ObservableCollection<Function>();
+
+            foreach (var item in parentsInverted)
+            {
+                res.Add(new(item.Caller, null, default, GetFunctionTriggerType(item.Caller), item.FilePath, item.LineNumber) { Children = new() { item } });
+            }
+
+            return res;
         }
 
         private IEnumerable<Function> GetTopmostParents(IEnumerable<Function> hierarchy)
@@ -114,7 +134,7 @@ namespace Functionator.Analyzer
             return allFiles.Select(GetFileFunctions).SelectMany(x => x).ToList();
         }
 
-        internal string GetFunctionTriggerType(string functionName) =>
+        private string GetFunctionTriggerType(string functionName) =>
             _functions.FirstOrDefault(x => x.Name == functionName && !string.IsNullOrEmpty(x.TriggerTypeString))?.TriggerTypeString;
         
         private List<Function> GetFileFunctions(string file)

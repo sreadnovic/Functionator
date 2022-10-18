@@ -104,26 +104,18 @@ namespace Functionator
             NoChildren = true;
             NoParents = true;
 
-            var children = _analyzer.GetChildren(FuncName);
+            Children = _analyzer.GetChildrenHierarchy(FuncName);
 
-            if (children != null && children.Any())
+            if (Children != null && Children.Any())
             {
-                Children = new () { new (children.First().Caller, null, default, _analyzer.GetFunctionTriggerType(children.First().Caller), children.First().FilePath, children.First().LineNumber) { Children = children } };
                 AnyChildren = true;
                 NoChildren = false;
             }
 
-            var prnts = _analyzer.GetParentsInverted(FuncName);
+            Parents = _analyzer.GetParentsHierarchy(FuncName);
 
-            if (prnts != null && prnts.Any())
+            if (Parents != null && Parents.Any())
             {
-                Parents = new();
-
-                foreach (var function in prnts)
-                {
-                    Parents.Add(new(function.Caller, null, default, _analyzer.GetFunctionTriggerType(function.Caller), function.FilePath, function.LineNumber) { Children = new() { function } });
-                }
-
                 AnyParents = true;
                 NoParents = false;
             }
