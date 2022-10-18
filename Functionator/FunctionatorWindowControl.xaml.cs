@@ -80,10 +80,7 @@ namespace Functionator
         internal async Task AnalyzeThisAsync()
         {
             await UpdateFunctionsAsync();
-
-            AnyChildren = default;
-            AnyParents = default;
-
+            
             Children = _analyzer.GetChildrenHierarchy(FuncName);
             AnyChildren = Children != null && Children.Any();
 
