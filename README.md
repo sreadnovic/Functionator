@@ -1,3 +1,5 @@
+![repo state](https://github.com/sreadnovic/Functionator/actions/workflows/build.yaml/badge.svg)
+
 # Functionator
 Visual studio extension to track the Azure Functions execution order.
 
