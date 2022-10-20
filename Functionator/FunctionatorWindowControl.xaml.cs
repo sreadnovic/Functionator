@@ -81,11 +81,33 @@ namespace Functionator
         {
             await UpdateFunctionsAsync();
             
-            Children = _analyzer.GetChildrenHierarchy(FuncName);
-            AnyChildren = Children != null && Children.Any();
+            UpdateParents();
+
+            UpdateChildren();
+        }
+
+        private void UpdateParents()
+        {
+            AnyParents = true;
 
             Parents = _analyzer.GetParentsHierarchy(FuncName);
-            AnyParents = Parents != null && Parents.Any();
+
+            if (Parents.Any()) return;
+
+            Parents = new() { new(default, default, default, default, default, default) };
+            AnyParents = false;
+        }
+
+        private void UpdateChildren()
+        {
+            AnyChildren = true;
+            
+            Children = _analyzer.GetChildrenHierarchy(FuncName);
+
+            if (Children.Any()) return;
+
+            Children = new() { new(default, default, default, default, default, default) };
+            AnyChildren = false;
         }
 
         private async Task UpdateFunctionsAsync()
