@@ -11,6 +11,20 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:BooleanToVisibilityInvertedConverter x:Key="BooleanToVisibilityInvertedConverter"/>
+
+        <HierarchicalDataTemplate x:Key="FunctionTemplate" DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>
+                    <Run Text="["/>
+                    <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
+                    <Run Text="] "/>
+                    <Run Text="{Binding Name}"/>
+                    <Run Text=" (" FontStyle="Italic"/>
+                    <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                    <Run Text=" items)" FontStyle="Italic"/>
+                </TextBlock>
+            </StackPanel>
+        </HierarchicalDataTemplate>
     </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical">
@@ -28,21 +42,8 @@
 
                     <TreeView Name="ParentsTreeView"
                               BorderThickness="0"
-                              ItemsSource="{Binding Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
-                                <TextBlock>
-                                    <Run Text="["/>
-                                    <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
-                                    <Run Text="] "/>
-                                    <Run Text="{Binding Name}"/>
-                                    <Run Text=" (" FontStyle="Italic"/>
-                                    <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
-                                    <Run Text=" items)" FontStyle="Italic"/>
-                                </TextBlock>
-                            </HierarchicalDataTemplate>
-                        </TreeView.Resources>
-                    </TreeView>
+                              ItemsSource="{Binding Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                              ItemTemplate="{StaticResource FunctionTemplate}"/>
                 </StackPanel>
 
                 <TextBlock Visibility="{Binding AnyParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityInvertedConverter}}" Text="No parents found!"/>
@@ -61,21 +62,8 @@
 
                     <TreeView Name="ChildrenTreeView"
                               BorderThickness="0"
-                              ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
-                                <TextBlock>
-                                    <Run Text="["/>
-                                    <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
-                                    <Run Text="] "/>
-                                    <Run Text="{Binding Name}"/>
-                                    <Run Text=" (" FontStyle="Italic" />
-                                    <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
-                                    <Run Text=" items)" FontStyle="Italic"/>
-                                </TextBlock>
-                            </HierarchicalDataTemplate>
-                        </TreeView.Resources>
-                    </TreeView>
+                              ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                              ItemTemplate="{StaticResource FunctionTemplate}"/>
                 </StackPanel>
                 
                 <TextBlock Visibility="{Binding AnyChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityInvertedConverter}}" Text="No children found!"/>
