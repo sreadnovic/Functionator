@@ -14,15 +14,17 @@
 
         <HierarchicalDataTemplate x:Key="FunctionTemplate" DataType="{x:Type analyzer:Function}" ItemsSource="{Binding Children}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock>
-                    <Run Text="["/>
-                    <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
-                    <Run Text="] "/>
-                    <Run Text="{Binding Name}"/>
-                    <Run Text=" (" FontStyle="Italic"/>
-                    <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
-                    <Run Text=" items)" FontStyle="Italic"/>
-                </TextBlock>
+                <ContentControl MouseLeftButtonDown="FunctionTreeViewUIElement_OnMouseLeftButtonUp">
+                    <TextBlock>
+                        <Run Text="["/>
+                        <Run Text="{Binding TriggerTypeString}" FontWeight="Bold"/>
+                        <Run Text="] "/>
+                        <Run Text="{Binding Name}"/>
+                        <Run Text=" (" FontStyle="Italic"/>
+                        <Run Text="{Binding ChildrenCount, Mode=OneWay}" FontStyle="Italic"/>
+                        <Run Text=" items)" FontStyle="Italic"/>
+                    </TextBlock>
+                </ContentControl>
             </StackPanel>
         </HierarchicalDataTemplate>
     </UserControl.Resources>
@@ -34,17 +36,11 @@
             <Separator />
 
             <Grid>
-                <StackPanel Visibility="{Binding AnyParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel Orientation="Horizontal" >
-                        <Button x:Name="ParentsGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ParentsGoToUsageButton_OnClick"/>
-                        <Button x:Name="ParentsGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ParentsGoToDefinitionButton_OnClick" />
-                    </StackPanel>
-
-                    <TreeView Name="ParentsTreeView"
-                              BorderThickness="0"
-                              ItemsSource="{Binding Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                              ItemTemplate="{StaticResource FunctionTemplate}"/>
-                </StackPanel>
+                <TreeView Name="ParentsTreeView"
+                          Visibility="{Binding AnyParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                          BorderThickness="0"
+                          ItemsSource="{Binding Parents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                          ItemTemplate="{StaticResource FunctionTemplate}"/>
 
                 <TextBlock Visibility="{Binding AnyParents, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityInvertedConverter}}" Text="No parents found!"/>
             </Grid>
@@ -54,17 +50,11 @@
             <Separator />
 
             <Grid>
-                <StackPanel Visibility="{Binding AnyChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel Orientation="Horizontal">
-                        <Button x:Name="ChildrenGoToUsageButton" Content=">" Width="30" MinWidth="30" MaxWidth="30" Click="ChildrenGoToUsageButton_OnClick"/>
-                        <Button x:Name="ChildrenGoToDefinitionButton" Content=">>" Width="40" MinWidth="40" MaxWidth="40" Click="ChildrenGoToDefinitionButton_OnClick"/>
-                    </StackPanel>
-
-                    <TreeView Name="ChildrenTreeView"
-                              BorderThickness="0"
-                              ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                              ItemTemplate="{StaticResource FunctionTemplate}"/>
-                </StackPanel>
+                <TreeView Name="ChildrenTreeView"
+                          BorderThickness="0"
+                          Visibility="{Binding AnyChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                          ItemsSource="{Binding Children, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                          ItemTemplate="{StaticResource FunctionTemplate}"/>
                 
                 <TextBlock Visibility="{Binding AnyChildren, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityInvertedConverter}}" Text="No children found!"/>
             </Grid>

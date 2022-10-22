@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Community.VisualStudio.Toolkit;
 using Functionator.Analyzer;
 using Microsoft.VisualStudio.Shell;
@@ -120,21 +122,7 @@ namespace Functionator
             
             _analyzer.UpdateFunctions(Path.GetDirectoryName(path!.FullPath));
         }
-
-        private async void ParentsGoToUsageButton_OnClick(object sender, RoutedEventArgs e) =>
-            await GoToAsync(ParentsTreeView.SelectedItem as Function);
         
-
-        private async void ParentsGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e) =>
-            await GoToAsync(_analyzer.GetFunctionDefinition(ParentsTreeView.SelectedItem as Function));
-        
-
-        private async void ChildrenGoToUsageButton_OnClick(object sender, RoutedEventArgs e) =>
-            await GoToAsync(ChildrenTreeView.SelectedItem as Function);
-
-        private async void ChildrenGoToDefinitionButton_OnClick(object sender, RoutedEventArgs e) =>
-            await GoToAsync(_analyzer.GetFunctionDefinition(ChildrenTreeView.SelectedItem as Function));
-
         private async Task GoToAsync(Function function)
         {
             if (function == null) return;
@@ -144,6 +132,21 @@ namespace Functionator
             await VS.Documents.OpenAsync(function.FilePath);
             var ts = _dte.ActiveDocument.Selection as TextSelection;
             ts.MoveToLineAndOffset(function.LineNumber, 1);
+        }
+
+        private async void FunctionTreeViewUIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var function = (sender as ContentControl)!.DataContext as Function;
+
+            if (e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 2)
+            {
+                await GoToAsync(_analyzer.GetFunctionDefinition(function));
+                e.Handled = true;
+            }
+            else
+            {
+                await GoToAsync(function);
+            }
         }
     }
 }
