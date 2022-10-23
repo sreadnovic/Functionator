@@ -88,5 +88,10 @@ namespace FunctionatorUnitTests
             parents[1].Children[0].AssertFunctionProperties(referenceFunction);
             parents[1].Children[0].Children[0].AssertFunctionProperties(referenceChild);
         }
+
+        // TODO: All function attributes in one line
+        // TODO: Use constant for func name
+        // TODO: Mix string with nameof
+        // TODO: Process all use cases of function calls e.g. StartNewAsync with/without additional params
     }
 }

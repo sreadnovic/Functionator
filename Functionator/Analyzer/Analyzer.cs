@@ -27,15 +27,15 @@ namespace Functionator.Analyzer
         public void UpdateFunctions(string projectPath)
         {
             _functions = GetAllFunctions(projectPath);
-            
-            foreach (var item in _functions)
+
+            foreach (var item in _functions.Where(item => string.IsNullOrEmpty(item.TriggerTypeString)))
             {
-                if (string.IsNullOrEmpty(item.TriggerTypeString))
-                {
-                    item.TriggerTypeString = GetFunctionTriggerType(item.Name);
-                }
+                item.TriggerTypeString = GetFunctionTriggerType(item.Name);
             }
         }
+
+        private List<Function> GetAllFunctions(string location) =>
+            Directory.GetFiles(location, "*.cs", SearchOption.AllDirectories).Select(GetFileFunctions).SelectMany(x => x).ToList();
 
         internal Function GetFunctionDefinition(Function function) =>
             _functions.FirstOrDefault(x => x.Name == function.Name && x.FunctionType == FunctionType.Caller);
@@ -86,9 +86,7 @@ namespace Functionator.Analyzer
             {
                 parentsInverted.AddRange(GetChildren(parent.Name, disassembledParentsHierarchy));
             }
-
-            parentsInverted = parentsInverted.GroupBy(x => x.Name).Select(x => x.First()).ToList();
-
+            
             var res = new ObservableCollection<Function>();
 
             foreach (var item in parentsInverted)
@@ -103,7 +101,7 @@ namespace Functionator.Analyzer
         {
             foreach (var function in hierarchy)
             {
-                if (!function.Parents.Any()) yield return GetFunction(function.Caller);
+                if (!function.Parents.Any()) yield return _functions.FirstOrDefault(x => x.Name == function.Caller);
 
                 foreach (var item in GetTopmostParents(function.Parents.ToList()))
                 {
@@ -111,10 +109,7 @@ namespace Functionator.Analyzer
                 }
             }
         }
-
-        private Function GetFunction(string functionName) =>
-            _functions.FirstOrDefault(x => x.Name == functionName);
-
+        
         private void DisassembleHierarchy(IEnumerable<Function> hierarchy, ref List<Function> res)
         {
             res ??= new();
@@ -127,14 +122,7 @@ namespace Functionator.Analyzer
                 res.Add(item);
             }
         }
-
-        private List<Function> GetAllFunctions(string location)
-        {
-            var allFiles = Directory.GetFiles(location, "*.cs", SearchOption.AllDirectories);
-
-            return allFiles.Select(GetFileFunctions).SelectMany(x => x).ToList();
-        }
-
+        
         private string GetFunctionTriggerType(string functionName) =>
             _functions.FirstOrDefault(x => x.Name == functionName && !string.IsNullOrEmpty(x.TriggerTypeString))?.TriggerTypeString;
         
@@ -152,7 +140,7 @@ namespace Functionator.Analyzer
 
                 if (string.IsNullOrEmpty(trimmedLine)) continue;
 
-                Function func = null;
+                Function func;
                 
                 if (GetFunctionType(trimmedLine) == FunctionType.Caller)
                 {
@@ -161,9 +149,9 @@ namespace Functionator.Analyzer
                     callerFunctionName = func.Name;
 
                     fileFunctions.Add(func);
-                    completeLineOfCode = string.Empty;
+                    completeLineOfCode = default;
                 }
-                else if (trimmedLine.Contains(TriggerAttribute) || trimmedLine.Contains("Trigger(")) // second use case is for timer trigger
+                else if (trimmedLine.Contains(TriggerAttribute) || trimmedLine.Contains(TriggerAttributeWithParam))
                 {
                     var triggerType = GetCallerFunctionTriggerType(trimmedLine);
                     fileFunctions.Last(x => x.FunctionType == FunctionType.Caller).TriggerTypeString = triggerType;
@@ -179,7 +167,7 @@ namespace Functionator.Analyzer
                     func = GetFunction(completeLineOfCode, callerFunctionName, file, lineNumber);
 
                     fileFunctions.Add(func);
-                    completeLineOfCode = string.Empty;
+                    completeLineOfCode = default;
                 }
             }
 
@@ -190,30 +178,30 @@ namespace Functionator.Analyzer
         {
             var functionType = GetFunctionType(completeLineOfCode);
             var wrappers = GetFunctionStringWrappers(functionType);
-
-            var functionNameStart = 0;
-            var functionNameEnd = 0;
+            
+            string functionName = null;
 
             foreach (var wrapper in wrappers)
             {
-                functionNameStart = completeLineOfCode.IndexOf(wrapper.start, StringComparison.Ordinal) + wrapper.start.Length;
-                functionNameEnd = completeLineOfCode.IndexOf(wrapper.end, StringComparison.Ordinal);
-
-                if (functionNameStart != -1 && functionNameEnd != -1) break;
-            }
-                
-            var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd - functionNameStart).Replace("\"", string.Empty);
-
-            const string NameOf = "nameof(";
-
-            if (functionName.Contains(NameOf))
-            {
-                functionNameStart = functionName.IndexOf(NameOf, StringComparison.Ordinal) + NameOf.Length;
-                functionNameEnd = functionName.IndexOf(")", StringComparison.Ordinal);
-                functionName = functionName.Substring(functionNameStart, functionNameEnd - functionNameStart);
+                functionName = GetTextInBetween(completeLineOfCode, wrapper.start, wrapper.end);
+                if (functionName != null) break;
             }
 
+            const string nameOf = "nameof(";
+
+            functionName = functionName!.Contains(nameOf) ? GetTextInBetween(functionName, nameOf, ")") : functionName;
+            
             return new (functionName, callerFunctionName, functionType, default, filePath, lineNumber);
+        }
+
+        private string GetTextInBetween(string fullText, string start, string end)
+        {
+            var startIndex = fullText.IndexOf(start, StringComparison.Ordinal) + start.Length;
+            var endIndex = fullText.IndexOf(end, StringComparison.Ordinal);
+
+            if (startIndex == -1 || endIndex == -1) return default;
+
+            return fullText.Substring(startIndex, endIndex - startIndex).Replace("\"", string.Empty);
         }
 
         private string GetCallerFunctionTriggerType(string completeLineOfCode)
@@ -222,11 +210,7 @@ namespace Functionator.Analyzer
                 ? TriggerAttribute
                 : TriggerAttributeWithParam;
 
-            var triggerNameStart = completeLineOfCode.LastIndexOf('[',
-                completeLineOfCode.IndexOf(triggerAttribute, StringComparison.Ordinal)) + 1;
-
-            var triggerNameEnd = completeLineOfCode.IndexOf(triggerAttribute, StringComparison.Ordinal);
-            return completeLineOfCode.Substring(triggerNameStart, triggerNameEnd - triggerNameStart);
+            return GetTextInBetween(completeLineOfCode, "[", triggerAttribute);
         }
 
         private IEnumerable<(string start, string end)> GetFunctionStringWrappers(FunctionType functionType) =>
