@@ -8,16 +8,17 @@ namespace Functionator.Analyzer
 {
     public class Analyzer
     {
-        private const string FunctionAttribute = "[FunctionName(\"";
+        private const string FunctionAttribute = "[FunctionName(";
         private const string FunctionAttributeInterpolated = "[FunctionName($\"";
-        private const string StartNewAsyncCall = "StartNewAsync(\"";
+        private const string StartNewAsyncCall = "StartNewAsync(";
         private const string GenericActivityAsyncCall = "CallActivityAsync<";
-        private const string RegularActivityAsyncCall = "CallActivityAsync(\"";
+        private const string RegularActivityAsyncCall = "CallActivityAsync(";
         private const string GenericSubOrchestratorAsyncCall = "CallSubOrchestratorAsync<";
-        private const string RegularSubOrchestratorAsyncCall = "CallSubOrchestratorAsync(\"";
-        private const string FunctionCallStartString = ">(\"";
-        private const string FunctionCallEndString = "\",";
-        private const string FunctionAttributeEndString = "\")]";
+        private const string RegularSubOrchestratorAsyncCall = "CallSubOrchestratorAsync(";
+        private const string FunctionCallStartString = ">(";
+        private const string FunctionCallEndString = ",";
+        private const string FunctionCallEndStringNoParameters = ");";
+        private const string FunctionAttributeEndString = ")]";
         private const string TriggerAttribute = "Trigger]";
         private const string TriggerAttributeWithParam = "Trigger(";
 
@@ -187,32 +188,32 @@ namespace Functionator.Analyzer
 
         private Function GetFunction(string completeLineOfCode, string callerFunctionName, string filePath, int lineNumber)
         {
-            try
+            var functionType = GetFunctionType(completeLineOfCode);
+            var wrappers = GetFunctionStringWrappers(functionType);
+
+            var functionNameStart = 0;
+            var functionNameEnd = 0;
+
+            foreach (var wrapper in wrappers)
             {
-                var functionType = GetFunctionType(completeLineOfCode);
-                var wrappers = GetFunctionStringWrappers(functionType);
+                functionNameStart = completeLineOfCode.IndexOf(wrapper.start, StringComparison.Ordinal) + wrapper.start.Length;
+                functionNameEnd = completeLineOfCode.IndexOf(wrapper.end, StringComparison.Ordinal);
 
-                var functionNameStart = 0;
-                var functionNameEnd = 0;
-
-                foreach (var wrapper in wrappers)
-                {
-                    functionNameStart = completeLineOfCode.IndexOf(wrapper.start, StringComparison.Ordinal) + wrapper.start.Length;
-                    functionNameEnd = completeLineOfCode.IndexOf(wrapper.end, StringComparison.Ordinal);
-
-                    if (functionNameStart != -1 && functionNameEnd != -1) break;
-                }
+                if (functionNameStart != -1 && functionNameEnd != -1) break;
+            }
                 
-                var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd - functionNameStart);// [functionNameStart..functionNameEnd];
+            var functionName = completeLineOfCode.Substring(functionNameStart, functionNameEnd - functionNameStart).Replace("\"", string.Empty);
 
-                return new (functionName, callerFunctionName, functionType, default, filePath, lineNumber);
-            }
-            catch (Exception e)
+            const string NameOf = "nameof(";
+
+            if (functionName.Contains(NameOf))
             {
-
+                functionNameStart = functionName.IndexOf(NameOf, StringComparison.Ordinal) + NameOf.Length;
+                functionNameEnd = functionName.IndexOf(")", StringComparison.Ordinal);
+                functionName = functionName.Substring(functionNameStart, functionNameEnd - functionNameStart);
             }
-            
-            return null;
+
+            return new (functionName, callerFunctionName, functionType, default, filePath, lineNumber);
         }
 
         private string GetCallerFunctionTriggerType(string completeLineOfCode)
@@ -225,14 +226,14 @@ namespace Functionator.Analyzer
                 completeLineOfCode.IndexOf(triggerAttribute, StringComparison.Ordinal)) + 1;
 
             var triggerNameEnd = completeLineOfCode.IndexOf(triggerAttribute, StringComparison.Ordinal);
-            return completeLineOfCode.Substring(triggerNameStart, triggerNameEnd - triggerNameStart);// [triggerNameStart..triggerNameEnd];
+            return completeLineOfCode.Substring(triggerNameStart, triggerNameEnd - triggerNameStart);
         }
 
         private IEnumerable<(string start, string end)> GetFunctionStringWrappers(FunctionType functionType) =>
             functionType switch
             {
                 FunctionType.Caller => new() { (FunctionAttribute, FunctionAttributeEndString) } ,
-                FunctionType.Orchestrator => new() { (StartNewAsyncCall, FunctionCallEndString), (StartNewAsyncCall, "\")") },
+                FunctionType.Orchestrator => new() { (StartNewAsyncCall, FunctionCallEndString), (StartNewAsyncCall, FunctionCallEndStringNoParameters) },
                 FunctionType.Activity => new() { (RegularActivityAsyncCall, FunctionCallEndString) },
                 FunctionType.GenericActivity => new() { (FunctionCallStartString, FunctionCallEndString) },
                 FunctionType.SubOrchestrator => new() { (RegularSubOrchestratorAsyncCall, FunctionCallEndString) },

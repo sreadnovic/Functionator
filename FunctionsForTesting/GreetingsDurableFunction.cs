@@ -9,7 +9,7 @@ namespace FunctionsForTesting;
 
 public static class GreetingsDurableFunction
 {
-    [FunctionName("GreetingsDurableFunction")]
+    [FunctionName(nameof(GreetingsDurableFunction))]
     public static async Task RunOrchestrator(
         [OrchestrationTrigger] IDurableOrchestrationContext context)
     {
@@ -34,7 +34,7 @@ public static class GreetingsDurableFunction
         [DurableClient] IDurableOrchestrationClient starter,
         ILogger log)
     {
-        var instanceId = await starter.StartNewAsync("GreetingsDurableFunction");
+        var instanceId = await starter.StartNewAsync(nameof(GreetingsDurableFunction));
 
         log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
