@@ -9,18 +9,20 @@ namespace FunctionsForTesting;
 
 public static class GreetingsDurableFunction
 {
+    private const string ActivityFunction_Hello = "ActivityFunction_Hello";
+
     [FunctionName(nameof(GreetingsDurableFunction))]
     public static async Task RunOrchestrator(
         [OrchestrationTrigger] IDurableOrchestrationContext context)
     {
-        await context.CallActivityAsync<string>("ActivityFunction_Hello", "Tokyo");
+        await context.CallActivityAsync<string>(ActivityFunction_Hello, "Tokyo");
         await context.CallActivityAsync<string>("ActivityFunction_Hello", "Seattle");
-        await context.CallActivityAsync<string>("ActivityFunction_Hello", "London");
+        await context.CallActivityAsync<string>(ActivityFunction_Hello, "London");
 
         await context.CallSubOrchestratorAsync("GoodbyeDurableFunction", null);
     }
 
-    [FunctionName("ActivityFunction_Hello")]
+    [FunctionName(ActivityFunction_Hello)]
     public static string SayHello([ActivityTrigger] string name, ILogger log)
     {
         log.LogInformation($"Saying hello to {name}.");

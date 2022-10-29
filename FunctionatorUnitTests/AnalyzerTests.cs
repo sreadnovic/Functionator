@@ -45,16 +45,16 @@ namespace FunctionatorUnitTests
             const string callerName = "GreetingsDurableFunction";
             var children = _analyzer.GetChildrenHierarchy("GreetingsDurableFunction");
 
-            var referenceFunction = new Function("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 16);
+            var referenceFunction = new Function("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 18);
             children[0].Children[0].AssertFunctionProperties(referenceFunction);
 
-            referenceFunction = new Function("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 17);
+            referenceFunction = new Function("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 19);
             children[0].Children[1].AssertFunctionProperties(referenceFunction);
 
-            referenceFunction = new Function("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 18);
+            referenceFunction = new Function("ActivityFunction_Hello", callerName, FunctionType.GenericActivity, "Activity", filePath, 20);
             children[0].Children[2].AssertFunctionProperties(referenceFunction);
 
-            referenceFunction = new Function("GoodbyeDurableFunction", callerName, FunctionType.SubOrchestrator, "Orchestration", filePath, 20) { Children = new ObservableCollection<Function> { new Function(), new Function(), new Function() } };
+            referenceFunction = new Function("GoodbyeDurableFunction", callerName, FunctionType.SubOrchestrator, "Orchestration", filePath, 22) { Children = new ObservableCollection<Function> { new Function(), new Function(), new Function() } };
             children[0].Children[3].AssertFunctionProperties(referenceFunction);
         }
 
@@ -79,19 +79,16 @@ namespace FunctionatorUnitTests
 
             var parents = _analyzer.GetParentsHierarchy(functionName);
 
-            var referenceFunction = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 35);
+            var referenceFunction = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 31);
             parents[0].Children[0].AssertFunctionProperties(referenceFunction);
 
-            var referenceChild = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 20);
+            var referenceChild = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 22);
 
-            referenceFunction = new Function("GreetingsDurableFunction", "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 37) { Children = new ObservableCollection<Function> { referenceChild } };
+            referenceFunction = new Function("GreetingsDurableFunction", "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 39) { Children = new ObservableCollection<Function> { referenceChild } };
             parents[1].Children[0].AssertFunctionProperties(referenceFunction);
             parents[1].Children[0].Children[0].AssertFunctionProperties(referenceChild);
         }
-
-        // TODO: All function attributes in one line
-        // TODO: Use constant for func name
-        // TODO: Mix string with nameof
+        
         // TODO: Process all use cases of function calls e.g. StartNewAsync with/without additional params
     }
 }

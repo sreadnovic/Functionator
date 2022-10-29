@@ -26,13 +26,9 @@ public static class GoodbyeDurableFunction
     }
 
     [FunctionName("GoodbyeTriggerFunction_HttpStart")]
-    public static async Task<HttpResponseMessage> HttpStart(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]
-        HttpRequestMessage req,
-        [DurableClient] IDurableOrchestrationClient starter,
-        ILogger log)
+    public static async Task<HttpResponseMessage> HttpStart([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req, [DurableClient] IDurableOrchestrationClient starter, ILogger log)
     {
-        var instanceId = await starter.StartNewAsync("GoodbyeDurableFunction");
+        var instanceId = await starter.StartNewAsync(nameof(GoodbyeDurableFunction));
 
         log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
