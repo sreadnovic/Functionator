@@ -86,7 +86,9 @@ namespace Functionator.Analyzer
             {
                 parentsInverted.AddRange(GetChildren(parent.Name, disassembledParentsHierarchy));
             }
-            
+
+            parentsInverted = parentsInverted.GroupBy(x => x.Name).Select(x => x.First()).ToList();
+
             var res = new ObservableCollection<Function>();
 
             foreach (var item in parentsInverted)
