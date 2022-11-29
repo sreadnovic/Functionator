@@ -27,15 +27,15 @@ namespace FunctionatorUnitTests
         public void Analyzer_GetChildren_NoChildren()
         {
             var children = _analyzer.GetChildrenHierarchy("ActivityFunction_Hello");
-            Assert.AreEqual(children.Count, 0);
+            Assert.AreEqual(0, children.Count);
         }
 
         [TestMethod]
         public void Analyzer_GetChildren_HasChildren()
         {
             var children = _analyzer.GetChildrenHierarchy("GreetingsDurableFunction");
-            Assert.AreEqual(children.Count, 1);
-            Assert.AreEqual(children[0].Children.Count, 4);
+            Assert.AreEqual(1, children.Count);
+            Assert.AreEqual(4, children[0].Children.Count);
         }
 
         [TestMethod]
@@ -62,14 +62,16 @@ namespace FunctionatorUnitTests
         public void Analyzer_GetParents_NoParents()
         {
             var parents = _analyzer.GetParentsHierarchy("GreetingsTriggerFunction_HttpStart");
-            Assert.AreEqual(parents.Count, 0);
+            Assert.AreEqual(0, parents.Count);
         }
 
         [TestMethod]
         public void Analyzer_GetParents_HasParents()
         {
-            var parents = _analyzer.GetParentsHierarchy("GoodbyeDurableFunction");
-            Assert.AreEqual(parents.Count, 2);
+            var parents = _analyzer.GetParentsHierarchy("ActivityFunction_Hello");
+            Assert.AreEqual(1, parents.Count);
+            Assert.AreEqual(1, parents[0].Children.Count);
+            Assert.AreEqual(3, parents[0].Children[0].Children.Count);
         }
 
         [TestMethod]
