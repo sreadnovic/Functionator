@@ -48,6 +48,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Analyzer\Analyzer.cs" />
+    <Compile Include="Analyzer\Collector.cs" />
     <Compile Include="Analyzer\Enums.cs" />
     <Compile Include="Analyzer\Function.cs" />
     <Compile Include="Common\Converters\BooleanToVisibilityInvertedConverter.cs" />

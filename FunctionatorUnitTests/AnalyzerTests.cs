@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using Functionator.Analyzer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,17 +8,15 @@ namespace FunctionatorUnitTests
     public class AnalyzerTests
     {
         private readonly Analyzer _analyzer;
-
         private readonly string _functionsForTestingPathPrefix = @"D:\a\Functionator\Functionator\";
         
-
         public AnalyzerTests()
         {
             #if DEBUG
             _functionsForTestingPathPrefix = @"..\..\..\";
             #endif
 
-            _analyzer = new Analyzer();
+            _analyzer = Analyzer.GetInstance();
             _analyzer.UpdateFunctions($"{_functionsForTestingPathPrefix}FunctionsForTesting");
         }
 

@@ -39,7 +39,7 @@ namespace Functionator
         public FunctionatorWindowControl()
         {
             InitializeComponent();
-            _analyzer = new();
+            _analyzer = Analyzer.Analyzer.GetInstance();
             _dte = (DTE)Package.GetGlobalService(typeof(DTE));
         }
 
@@ -140,7 +140,7 @@ namespace Functionator
 
             if (e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 2)
             {
-                await GoToAsync(_analyzer.GetFunctionDefinition(function));
+                await GoToAsync(_analyzer.GetCallerFunction(function));
                 e.Handled = true;
             }
             else
