@@ -37,13 +37,13 @@ namespace FunctionatorUnitTests
 
             Assert.AreEqual(3, occurences.Count());
 
-            var definition = new Function(functionName, null, FunctionType.Caller, "Orchestration", "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 12);
+            var definition = new Function(functionName, null, FunctionType.Caller, "Orchestration",$"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 12);
             occurences[0].AssertFunctionProperties(definition);
 
-            var usage1 = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, null, "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 31);
+            var usage1 = new Function(functionName, "GoodbyeTriggerFunction_HttpStart", FunctionType.Orchestrator, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 31);
             occurences[1].AssertFunctionProperties(usage1);
 
-            var usage2 = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, null, "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 22);
+            var usage2 = new Function(functionName, "GreetingsDurableFunction", FunctionType.SubOrchestrator, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 22);
             occurences[2].AssertFunctionProperties(usage2);
         }
 
@@ -55,16 +55,16 @@ namespace FunctionatorUnitTests
 
             Assert.AreEqual(4, occurences.Count());
 
-            var definition = new Function(functionName, null, FunctionType.Caller, "Activity", "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 21);
+            var definition = new Function(functionName, null, FunctionType.Caller, "Activity", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 21);
             occurences[3].AssertFunctionProperties(definition);
 
-            var usage1 = new Function(functionName, "GoodbyeDurableFunction", FunctionType.GenericActivity, null, "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 16);
+            var usage1 = new Function(functionName, "GoodbyeDurableFunction", FunctionType.GenericActivity, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 16);
             occurences[0].AssertFunctionProperties(usage1);
 
-            var usage2 = new Function(functionName, "GoodbyeDurableFunction", FunctionType.GenericActivity, null, "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 17);
+            var usage2 = new Function(functionName, "GoodbyeDurableFunction", FunctionType.GenericActivity, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 17);
             occurences[1].AssertFunctionProperties(usage2);
 
-            var usage3 = new Function(functionName, "GoodbyeDurableFunction", FunctionType.GenericActivity, null, "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 18);
+            var usage3 = new Function(functionName, "GoodbyeDurableFunction", FunctionType.GenericActivity, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 18);
             occurences[2].AssertFunctionProperties(usage3);
         }
 
@@ -76,7 +76,7 @@ namespace FunctionatorUnitTests
 
             Assert.AreEqual(1, occurences.Count());
 
-            var definition = new Function(functionName, null, FunctionType.Caller, "Http", "..\\..\\..\\FunctionsForTesting\\GoodbyeDurableFunction.cs", 28);
+            var definition = new Function(functionName, null, FunctionType.Caller, "Http", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GoodbyeDurableFunction.cs", 28);
             occurences[0].AssertFunctionProperties(definition);
         }
 
@@ -88,10 +88,10 @@ namespace FunctionatorUnitTests
 
             Assert.AreEqual(2, occurences.Count());
 
-            var definition = new Function(functionName, null, FunctionType.Caller, "Orchestration", "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 14);
+            var definition = new Function(functionName, null, FunctionType.Caller, "Orchestration", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 14);
             occurences[0].AssertFunctionProperties(definition);
 
-            var usage1 = new Function(functionName, "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, null, "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 39);
+            var usage1 = new Function(functionName, "GreetingsTriggerFunction_HttpStart", FunctionType.Orchestrator, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 39);
             occurences[1].AssertFunctionProperties(usage1);
         }
 
@@ -103,16 +103,16 @@ namespace FunctionatorUnitTests
 
             Assert.AreEqual(4, occurences.Count());
 
-            var definition = new Function(functionName, null, FunctionType.Caller, "Activity", "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 25);
+            var definition = new Function(functionName, null, FunctionType.Caller, "Activity", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 25);
             occurences[3].AssertFunctionProperties(definition);
 
-            var usage1 = new Function(functionName, "GreetingsDurableFunction", FunctionType.GenericActivity, null, "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 18);
+            var usage1 = new Function(functionName, "GreetingsDurableFunction", FunctionType.GenericActivity, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 18);
             occurences[0].AssertFunctionProperties(usage1);
 
-            var usage2 = new Function(functionName, "GreetingsDurableFunction", FunctionType.GenericActivity, null, "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 19);
+            var usage2 = new Function(functionName, "GreetingsDurableFunction", FunctionType.GenericActivity, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 19);
             occurences[1].AssertFunctionProperties(usage2);
 
-            var usage3 = new Function(functionName, "GreetingsDurableFunction", FunctionType.GenericActivity, null, "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 20);
+            var usage3 = new Function(functionName, "GreetingsDurableFunction", FunctionType.GenericActivity, null, $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 20);
             occurences[2].AssertFunctionProperties(usage3);
         }
 
@@ -124,7 +124,7 @@ namespace FunctionatorUnitTests
 
             Assert.AreEqual(1, occurences.Count());
 
-            var definition = new Function(functionName, null, FunctionType.Caller, "Http", "..\\..\\..\\FunctionsForTesting\\GreetingsDurableFunction.cs", 32);
+            var definition = new Function(functionName, null, FunctionType.Caller, "Http", $"{_functionsForTestingPathPrefix}FunctionsForTesting\\GreetingsDurableFunction.cs", 32);
             occurences[0].AssertFunctionProperties(definition);
         }
     }
