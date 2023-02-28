@@ -27,6 +27,9 @@ Analysis of one file:
 
 ![File analysis diagram](https://user-images.githubusercontent.com/7647183/190891326-cdef78ae-1845-4ae1-af11-f594704be50c.jpg)
 
+![image](https://user-images.githubusercontent.com/7647183/221810131-58fdd31d-45e8-4e10-b2e7-d12e936f1051.png)
+
+
 # Useful resources
 
 Official Microsoft's Visual Studio extensibility documentation home page:
